@@ -1,2 +1,2 @@
 # fxsizedistr
-An R package for calculating effect size distributions in meta analyses
+An R package for calculating effect size distributions in meta analyses.
