@@ -1,25 +1,25 @@
 pb_adj <- function(df, es, adj_es, grouping_var = NULL, method = "quads", csv_write = FALSE) {
   if(missing(grouping_var)) {
     es_median <- median(df[, deparse(substitute(es))], na.rm = TRUE)
-    adj_ratio <- (es_median - adj_es) / es_median
+    adj_ratio <- adj_es / es_median
 
     if(method == "thirds") {
       adj_values <- df %>%
         summarise(cdq16 = quantile({{ es }}, prob = .1665, na.rm = TRUE),
-                  cdq16_adj = cdq16 - (1.36 * adj_ratio * cdq16),
+                  cdq16_adj = cdq16 * adj_ratio * 3.42 * (es_median - cdq16),
                   cdq50 = quantile({{ es }}, prob = .50, na.rm = TRUE),
                   cdq50_adj = adj_es,
                   cdq83 = quantile({{ es }}, prob = .8335, na.rm = TRUE),
-                  cdq83_adj = cdq83 - (0.641 * adj_ratio * cdq83),
+                  cdq83_adj = cdq83 * adj_ratio * 5.59 * (cdq83 - es_median),
                   count = n())
     } else if (method == "quads") {
       adj_values <- df %>%
         summarise(cdq25 = quantile({{ es }}, prob = .25, na.rm = TRUE),
-                  cdq25_adj = cdq25 - (1.14 * adj_ratio * cdq25),
+                  cdq25_adj = cdq25 * adj_ratio * 6.43 * (es_median - cdq25),
                   cdq50 = quantile({{ es }}, prob = .50, na.rm = TRUE),
                   cdq50_adj = adj_es,
                   cdq75 = quantile({{ es }}, prob = .75, na.rm = TRUE),
-                  cdq75_adj = cdq75 - (0.752 * adj_ratio * cdq75),
+                  cdq75_adj = cdq75 * adj_ratio * 7.59 * (cdq75 - es_median),
                   count = n())
     } else {
       return("Please enter a valid method")
