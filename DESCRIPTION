@@ -1,5 +1,5 @@
 Package: fxsizedistr
-Title: What the Package Does (One Line, Title Case)
+Title: Calculate and plot effect size distributions
 Version: 0.0.0.9000
 Authors@R: 
     person("Bernt", "Glaser", , "berntgla@uio.no", role = c("aut", "cre"))
