@@ -2,9 +2,9 @@ library(dplyr)
 library(devtools)
 library(ggplot2)
 
-dat <- read.csv("dat.csv")
+setwd("../fxsizedistr")
 
-dat$yi[dat$yi < 0.00] <- -1 * dat$yi[dat$yi < 0.00]
+dat <- read.csv("dat.csv")
 
 adj_es_test <- dat %>%
   group_by(group) %>%
@@ -45,3 +45,10 @@ esd_plot(dat, yi, "cohen's d", method = "thirds")
 esd_table(dat, yi)
 pb_adj(dat, yi, 0.2)
 esd_table_pba(dat, yi, adj_es_test, grouping_var=group)
+
+list <- c()
+for (i in 1:5) {
+  list[i] <- vangogh_palette("SelfPortrait")[i]
+}
+
+

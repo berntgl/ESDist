@@ -29,7 +29,7 @@ esd_plot <- function(df, es, es_type, method = "quads", bin_width = 0.05) {
   } else {
     return("Please enter a valid method")
   }
-  ggplot(data = df, aes(es_col)) +
+  plot <- ggplot(data = df, aes(es_col)) +
     geom_histogram(fill = "#0C6170", binwidth = bin_width) +
     geom_vline(aes(xintercept = cdq1), color = "#E5A4A9", linetype = "dashed", size = 1) +
     annotate("text", x = (cdq1 + 0.05), y = 2, color = "#E5A4A9", label = cdq1_label, angle = 90) +
@@ -43,4 +43,5 @@ esd_plot <- function(df, es, es_type, method = "quads", bin_width = 0.05) {
           axis.text.x  = element_text(size = 16),
           axis.title.y = element_text(face = "bold", size = 20),
           axis.text.y  = element_text(size = 16))
+  return(plot)
 }
