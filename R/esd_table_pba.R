@@ -23,20 +23,20 @@ esd_table_pba <- function(df, es, adj_es, grouping_var = NULL, method = "quads",
     if(method == "thirds") {
       adj_values <- df %>%
         summarise(q16 = quantile({{ es }}, prob = .1665, na.rm = TRUE),
-                  q16_adj = cdq16  - 0.698 * (es_median - adj_es),
+                  q16_adj = q16  - 0.698 * (es_median - adj_es),
                   q50 = quantile({{ es }}, prob = .50, na.rm = TRUE),
                   q50_adj = adj_es,
                   q83 = quantile({{ es }}, prob = .8335, na.rm = TRUE),
-                  q83_adj = cdq83 - ((es_median - adj_es)/0.903),
+                  q83_adj = q83 - ((es_median - adj_es)/0.903),
                   count = n())
     } else if (method == "quads") {
       adj_values <- df %>%
         summarise(q25 = quantile({{ es }}, prob = .25, na.rm = TRUE),
-                  q25_adj = cdq25 - 0.718 * (es_median - adj_es),
+                  q25_adj = q25 - 0.718 * (es_median - adj_es),
                   q50 = quantile({{ es }}, prob = .50, na.rm = TRUE),
                   q50_adj = adj_es,
                   q75 = quantile({{ es }}, prob = .75, na.rm = TRUE),
-                  q75_adj = cdq75 - ((es_median - adj_es)/0.895),
+                  q75_adj = q75 - ((es_median - adj_es)/0.895),
                   count = n())
     } else {
       return("Please enter a valid method")

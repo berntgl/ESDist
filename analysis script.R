@@ -4,6 +4,8 @@ library(ggplot2)
 
 dat <- read.csv("dat.csv")
 
+dat$yi[dat$yi < 0.00] <- -1 * dat$yi[dat$yi < 0.00]
+
 adj_es_test <- dat %>%
   group_by(group) %>%
   summarise(median = median(yi))
