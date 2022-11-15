@@ -1,3 +1,19 @@
+#' Creating a table for an effect size distribution
+#'
+#' @param df Dataset
+#' @param es Column name of effect sizes
+#' @param grouping_var Column name of grouping variable
+#' @param method Defaults to 'quads', can also be 'thirds'
+#' @param csv_write Defaults to FALSE. Will write the outputted table as a csv
+#' when set to TRUE.
+#'
+#' @return a matrix
+#' @export
+#'
+#' @examples
+#' esd_table(df, es, grouping_var = group, method = "thirds")
+#'
+#'
 esd_table <- function(df, es, grouping_var = NULL, method = "quads", csv_write = FALSE) {
   if(missing(grouping_var)) {
     if(method == "quads") {

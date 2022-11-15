@@ -1,3 +1,21 @@
+#' Adjusting an ESD for publication bias
+#'
+#' @param df Dataset
+#' @param es The name of the column containing the effect sizes
+#' @param adj_es Adjusted effect size. Can be a single number, or a vector of
+#' numbers that correspond to the adjusted effect sizes for each group in
+#' alphabetical order, with the overall adjusted effect size at the end.
+#' @param grouping_var Column name of grouping variable
+#' @param method Defaults to 'quads', can also be 'thirds'
+#' @param csv_write Defaults to FALSE. Will write the outputted table as a csv
+#' when set to TRUE.
+#'
+#' @return a matrix
+#' @export
+#'
+#' @examples
+#' esd_table_pba(df, es, 0.2, grouping_var = group, method = "thirds")
+#'
 esd_table_pba <- function(df, es, adj_es, grouping_var = NULL, method = "quads", csv_write = FALSE) {
   if(missing(grouping_var)) {
     es_median <- median(df[, deparse(substitute(es))], na.rm = TRUE)

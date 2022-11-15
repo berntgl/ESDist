@@ -1,3 +1,15 @@
+#' Creating a plot for an effect size distribution
+#'
+#' @param df Dataset
+#' @param es Column name of effect sizes
+#' @param es_type A string describing the type of effect size used (e.g., "Cohen's d")
+#' @param method Defaults to 'quads', can also be 'thirds'
+#' @param bin_width Sets the bin width for the histogram
+#'
+#' @return A ggplot object
+#' @export
+#'
+#' @examples esd_plot(df, es, es_type = "Cohen's d", method = thirds)
 esd_plot <- function(df, es, es_type, method = "quads", bin_width = 0.05) {
   es_col <- df[, deparse(substitute(es))]
   if (method == "quads") {
