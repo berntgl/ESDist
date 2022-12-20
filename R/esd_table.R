@@ -76,7 +76,6 @@ esd_table <- function(df, es, grouping_var = NULL, method = "quads", csv_write =
       return("Please enter a valid method")
     }
 
-
     es_values <- as.matrix(es_values)
     es_table <- matrix(nrow = nrow(es_values), ncol = 4)
     rownames(es_table) <- as.character(es_values[,1])

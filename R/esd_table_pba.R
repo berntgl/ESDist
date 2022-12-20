@@ -19,24 +19,25 @@
 esd_table_pba <- function(df, es, adj_es, grouping_var = NULL, method = "quads", csv_write = FALSE) {
   if(missing(grouping_var)) {
     es_median <- median(df[, deparse(substitute(es))], na.rm = TRUE)
+    adj_es_med <- es_median - 1.135 * (mean(df[, deparse(substitute(es))], na.rm = TRUE) - adj_es)
 
     if(method == "thirds") {
       adj_values <- df %>%
         summarise(q16 = quantile({{ es }}, prob = .1665, na.rm = TRUE),
-                  q16_adj = q16  - 0.698 * (es_median - adj_es),
+                  q16_adj = q16  - 0.698 * (es_median - adj_es_med),
                   q50 = quantile({{ es }}, prob = .50, na.rm = TRUE),
-                  q50_adj = adj_es,
+                  q50_adj = adj_es_med,
                   q83 = quantile({{ es }}, prob = .8335, na.rm = TRUE),
-                  q83_adj = q83 - ((es_median - adj_es)/0.903),
+                  q83_adj = q83 - ((es_median - adj_es_med)/0.903),
                   count = n())
     } else if (method == "quads") {
       adj_values <- df %>%
         summarise(q25 = quantile({{ es }}, prob = .25, na.rm = TRUE),
-                  q25_adj = q25 - 0.718 * (es_median - adj_es),
+                  q25_adj = q25 - 0.718 * (es_median - adj_es_med),
                   q50 = quantile({{ es }}, prob = .50, na.rm = TRUE),
-                  q50_adj = adj_es,
+                  q50_adj = adj_es_med,
                   q75 = quantile({{ es }}, prob = .75, na.rm = TRUE),
-                  q75_adj = q75 - ((es_median - adj_es)/0.895),
+                  q75_adj = q75 - ((es_median - adj_es_med)/0.895),
                   count = n())
     } else {
       return("Please enter a valid method")
@@ -58,47 +59,51 @@ esd_table_pba <- function(df, es, adj_es, grouping_var = NULL, method = "quads",
                                 df[,deparse(substitute(grouping_var))],
                                 median)),
                    median(df[,deparse(substitute(es))]))
-
+    es_mean <- c(as.vector(by(df[,deparse(substitute(es))],
+                              df[,deparse(substitute(grouping_var))],
+                              mean)),
+                 mean(df[,deparse(substitute(es))]))
+    adj_es_med <- es_median - 1.135 * (es_mean - adj_es)
 
     if (method == "thirds") {
       adj_values <- df %>%
         group_by({{ grouping_var }}) %>%
         summarise(cdq16 = quantile({{ es }}, prob = .1665, na.rm = TRUE),
-                  q16_adj = q16  - 0.698 * (es_median[as.numeric(cur_group_id())] - adj_es[as.numeric(cur_group_id())]),
+                  q16_adj = q16  - 0.698 * (es_median[as.numeric(cur_group_id())] - adj_es_med[as.numeric(cur_group_id())]),
                   q50 = quantile({{ es }}, prob = .50, na.rm = TRUE),
-                  q50_adj = adj_es[as.numeric(cur_group_id())],
+                  q50_adj = adj_es_med[as.numeric(cur_group_id())],
                   q83 = quantile({{ es }}, prob = .8335, na.rm = TRUE),
-                  q83_adj = q83 - ((es_median[as.numeric(cur_group_id())] - adj_es[as.numeric(cur_group_id())])/0.903),
+                  q83_adj = q83 - ((es_median[as.numeric(cur_group_id())] - adj_es_med[as.numeric(cur_group_id())])/0.903),
                   count = n()) %>%
         ungroup() %>%
         bind_rows(df %>%
                     summarise({{grouping_var}} := "All",
                               q16 = quantile({{ es }}, prob = .1665, na.rm = TRUE),
-                              q16_adj = q16  - 0.698 * (es_median[as.numeric(length(es_median))] - adj_es[as.numeric(length(adj_es))]),
+                              q16_adj = q16  - 0.698 * (es_median[as.numeric(length(es_median))] - adj_es_med[as.numeric(length(adj_es))]),
                               q50 = quantile({{ es }}, prob = .50, na.rm = TRUE),
-                              q50_adj = adj_es[as.numeric(length(adj_es))],
+                              q50_adj = adj_es_med[as.numeric(length(adj_es_med))],
                               q83 = quantile({{ es }}, prob = .8335, na.rm = TRUE),
-                              q83_adj = q83 - ((es_median[as.numeric(length(es_median))] - adj_es[as.numeric(length(adj_es))])/0.903),
+                              q83_adj = q83 - ((es_median[as.numeric(length(es_median))] - adj_es_med[as.numeric(length(adj_es_med))])/0.903),
                               count = n()))
 
     } else if (method == "quads") {
       adj_values <- df %>%
         group_by({{ grouping_var }}) %>%
         summarise(q25 = quantile({{ es }}, prob = .25, na.rm = TRUE),
-                  q25_adj = q25  - 0.718 * (es_median[as.numeric(cur_group_id())] - adj_es[as.numeric(cur_group_id())]),
+                  q25_adj = q25  - 0.718 * (es_median[as.numeric(cur_group_id())] - adj_es_med[as.numeric(cur_group_id())]),
                   q50 = quantile({{ es }}, prob = .50, na.rm = TRUE),
-                  q50_adj = adj_es[as.numeric(cur_group_id())],
+                  q50_adj = adj_es_med[as.numeric(cur_group_id())],
                   q75 = quantile({{ es }}, prob = .75, na.rm = TRUE),
-                  q75_adj = q75 - ((es_median[as.numeric(cur_group_id())] - adj_es[as.numeric(cur_group_id())])/0.895),
+                  q75_adj = q75 - ((es_median[as.numeric(cur_group_id())] - adj_es_med[as.numeric(cur_group_id())])/0.895),
                   count = n()) %>%
         ungroup() %>%
         bind_rows(df %>% summarise({{grouping_var}} := "All",
                                    q25 = quantile({{ es }}, prob = .25, na.rm = TRUE),
-                                   q25_adj = q25  - 0.718 * (es_median[as.numeric(length(es_median))] - adj_es[as.numeric(length(adj_es))]),
+                                   q25_adj = q25  - 0.718 * (es_median[as.numeric(length(es_median))] - adj_es_med[as.numeric(length(adj_es_med))]),
                                    q50 = quantile({{ es }}, prob = .50, na.rm = TRUE),
-                                   q50_adj = adj_es[as.numeric(length(adj_es))],
+                                   q50_adj = adj_es_med[as.numeric(length(adj_es_med))],
                                    q75 = quantile({{ es }}, prob = .75, na.rm = TRUE),
-                                   q75_adj = q75 - ((es_median[as.numeric(length(es_median))] - adj_es[as.numeric(length(adj_es))])/0.895),
+                                   q75_adj = q75 - ((es_median[as.numeric(length(es_median))] - adj_es_med[as.numeric(length(adj_es_med))])/0.895),
                                    count = n()))
     } else {
       return("please enter a valid method")
