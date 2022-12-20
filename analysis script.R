@@ -37,11 +37,12 @@ dat_filt_abs$yi <- abs(dat_filt_abs$yi)
 # Load all the functions from the R package
 load_all()
 
-# Plot the ESD. On
-plot1 <- esd_plot(dat_filt_abs, yi, "Cohen's d", bin_width = 0.2)
+# Plot the ESD.
+plot1 <- esd_plot(dat_filt_abs, yi, "Cohen's d", method = "thirds")
+plot1
 plot2 <- esd_plot_perc(dat_filt_abs, yi, "Cohen's d")
+plot2
 
-grid.arrange(plot1, plot2, ncol=2)
 
 # Get the values for each benchmark
 esd_table(dat_filt_abs, yi)
