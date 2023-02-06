@@ -4,16 +4,30 @@
 \alias{esd_plot}
 \title{Creating a plot for an effect size distribution}
 \usage{
-esd_plot(df, es, es_type, method = "quads", bin_width = 0.05)
+esd_plot(
+  df,
+  es,
+  es_type,
+  pop_es = NULL,
+  method = FALSE,
+  mean = FALSE,
+  bin_width = 0.1
+)
 }
 \arguments{
 \item{df}{Dataset}
 
 \item{es}{Column name of effect sizes}
 
-\item{es_type}{A string describing the type of effect size used (e.g., "Cohen's d")}
+\item{es_type}{A string describing the type of effect size used (e.g.,
+"Cohen's d")}
 
-\item{method}{Defaults to 'quads', can also be 'thirds'}
+\item{pop_es}{A numeric argument that corresponds to the population ES of
+interest. This will split the histogram into two parts around the inputted
+value.}
+
+\item{method}{Defaults to 'none', can also be 'thirds' for 16.65th, 50th, and
+83.35th percentiles, or 'quads' for 25th, 50th, and 75th percentiles.}
 
 \item{bin_width}{Sets the bin width for the histogram}
 }
@@ -24,5 +38,5 @@ A ggplot object
 Creating a plot for an effect size distribution
 }
 \examples{
-esd_plot(df, es, es_type = "Cohen's d", method = thirds)
+esd_plot(df, es, es_type = "Cohen's d", method = "thirds", pop)
 }
