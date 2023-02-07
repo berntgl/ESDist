@@ -10,4 +10,6 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.1
 Imports: 
     dplyr,
-    ggplot2
+    ggplot2,
+    grid,
+    gridExtra

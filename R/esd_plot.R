@@ -4,18 +4,21 @@
 #' @param es Column name of effect sizes
 #' @param es_type A string describing the type of effect size used (e.g.,
 #'   "Cohen's d")
-#' @param method Defaults to 'none', can also be 'thirds' for 16.65th, 50th, and
+#' @param method Defaults to FALSE, can also be 'thirds' for 16.65th, 50th, and
 #'   83.35th percentiles, or 'quads' for 25th, 50th, and 75th percentiles.
-#' @param bin_width Sets the bin width for the histogram
-#' @param pop_es A numeric argument that corresponds to the population ES of
+#' @param mean Defaults to FALSE, but will insert a ggplot geom_vline element
+#'   that corresponds to the mean effect size
+#' @param pop_es #' @param pop_es A numeric argument that corresponds to the population ES of
 #'   interest. This will split the histogram into two parts around the inputted
 #'   value.
+#' @param bin_width Numeric argument that corresponds to the bin width for the
+#'   histogram. Defaults to 0.1
 #'
 #' @return A ggplot object
 #' @export
 #'
 #' @examples esd_plot(df, es, es_type = "Cohen's d", method = "thirds", pop)
-esd_plot <- function(df, es, es_type, pop_es = NULL, method = FALSE, mean = FALSE, bin_width = 0.1) {
+esd_plot <- function(df, es, es_type, method = FALSE, mean = FALSE, pop_es = NULL, bin_width = 0.1) {
   es_col <- df[, deparse(substitute(es))]
 
   if (missing(pop_es)){
