@@ -14,7 +14,11 @@
 #' esd_table(df, es, grouping_var = group, method = "thirds")
 #'
 #'
-esd_table <- function(df, es, grouping_var = NULL, method = "quads", csv_write = FALSE) {
+esd_table <- function(df,
+                      es,
+                      grouping_var = NULL,
+                      method = "quads",
+                      csv_write = FALSE) {
   if(missing(grouping_var)) {
     if(method == "quads") {
       es_values <- df %>%

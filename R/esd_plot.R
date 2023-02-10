@@ -18,7 +18,13 @@
 #' @export
 #'
 #' @examples esd_plot(df, es, es_type = "Cohen's d", method = "thirds", pop)
-esd_plot <- function(df, es, es_type, method = FALSE, mean = FALSE, pop_es = NULL, bin_width = 0.1) {
+esd_plot <- function(df,
+                     es,
+                     es_type,
+                     method = FALSE,
+                     mean = FALSE,
+                     pop_es = NULL,
+                     bin_width = 0.1) {
   es_col <- df[, deparse(substitute(es))]
 
   if (missing(pop_es)){
@@ -37,7 +43,8 @@ esd_plot <- function(df, es, es_type, method = FALSE, mean = FALSE, pop_es = NUL
     rank_rev_perc <- sprintf("%.2f%%", rank_rev)
 
     plot <- ggplot(data = df) +
-      geom_histogram(aes(es_col, fill = stat(x) > pop_es), binwidth = bin_width) +
+      geom_histogram(aes(es_col, fill = stat(x) > pop_es),
+                     binwidth = bin_width) +
       scale_fill_manual(name = sprintf("ES < or > %.2f", pop_es),
                         labels = c(rank_perc, rank_rev_perc),
                         values = c("#EEE0CB", "#355C7D")) +
@@ -62,14 +69,23 @@ esd_plot <- function(df, es, es_type, method = FALSE, mean = FALSE, pop_es = NUL
     q3_label <- "75th"
 
     plot <- plot +
-      geom_vline(aes(xintercept = q1, color = "q1"), linetype = "dashed", size = 1) +
-      geom_vline(aes(xintercept = q2, color = "q2"), linetype = "dashed", size = 1) +
-      geom_vline(aes(xintercept = q3, color = "q3"), linetype = "dashed", size = 1) +
+      geom_vline(aes(xintercept = q1, color = "q1"),
+                 linetype = "dashed",
+                 size = 1) +
+      geom_vline(aes(xintercept = q2,
+                     color = "q2"),
+                 linetype = "dashed",
+                 size = 1) +
+      geom_vline(aes(xintercept = q3, color = "q3"),
+                 linetype = "dashed",
+                 size = 1) +
       scale_color_manual(name = "Percentiles",
-                         values = c(q1 = "#F8B195", q2 = "#F67280", q3 = "#C06C84", q4 = "#7DAA92"),
+                         values = c(q1 = "#F8B195", q2 = "#F67280",
+                                    q3 = "#C06C84", q4 = "#7DAA92"),
                          labels = c(q1_label, q2_label, q3_label, "Mean"))+
       theme(legend.position = c(0.9, 0.7),
-            legend.background = element_rect(fill="#dde7f0", color = "#dde7f0"))
+            legend.background = element_rect(fill="#dde7f0",
+                                             color = "#dde7f0"))
 
     } else if (method == "thirds") {
       q1 <- quantile(es_col, prob = 0.1665)
@@ -79,13 +95,22 @@ esd_plot <- function(df, es, es_type, method = FALSE, mean = FALSE, pop_es = NUL
       q3 <- quantile(es_col, prob = 0.8335)
       q3_label <- "83.35th"
       plot <- plot +
-        geom_vline(aes(xintercept = q1, color = "q1"), linetype = "dashed", size = 1) +
-        geom_vline(aes(xintercept = q2, color = "q2"), linetype = "dashed", size = 1) +
-        geom_vline(aes(xintercept = q3, color = "q3"), linetype = "dashed", size = 1) +
+        geom_vline(aes(xintercept = q1, color = "q1"),
+                   linetype = "dashed",
+                   size = 1) +
+        geom_vline(aes(xintercept = q2, color = "q2"),
+                   linetype = "dashed",
+                   size = 1) +
+        geom_vline(aes(xintercept = q3, color = "q3"),
+                   linetype = "dashed",
+                   size = 1) +
         scale_color_manual(name = "Percentiles",
-                           values = c(q1 = "#F8B195", q2 = "#F67280", q3 = "#C06C84", q4 = "#7DAA92"),
+                           values = c(q1 = "#F8B195", q2 = "#F67280",
+                                      q3 = "#C06C84", q4 = "#7DAA92"),
                            labels = c(q1_label, q2_label, q3_label, "Mean"))+
-        theme(legend.position = c(0.9, 0.7), legend.background = element_rect(fill="#dde7f0", color = "#dde7f0"))
+        theme(legend.position = c(0.9, 0.7),
+              legend.background = element_rect(fill="#dde7f0",
+                                               color = "#dde7f0"))
     } else {
       return("Please enter a valid method")
     }
@@ -96,7 +121,8 @@ esd_plot <- function(df, es, es_type, method = FALSE, mean = FALSE, pop_es = NUL
   }
   if (mean == TRUE) {
     plot <- plot +
-      geom_vline(aes(xintercept = mean(es_col), color = "q4"), linetype = "dotted", size = 1)
+      geom_vline(aes(xintercept = mean(es_col), color = "q4"),
+                 linetype = "dotted", size = 1)
   } else {
     plot <- plot
   }

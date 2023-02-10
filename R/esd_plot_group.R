@@ -17,8 +17,17 @@
 #' @return A ggplot element
 #' @export
 #'
-#' @examples
-esd_plot_group <- function(df, es, es_type, grouping_var, method = FALSE, mean = FALSE, pop_es = NULL, bin_width = 0.1) {
+#' @examples esd_plot_group(df, es, grouping_var = group,
+#' es_type = "Cohen's d", method = "thirds", pop)
+
+esd_plot_group <- function(df,
+                           es,
+                           es_type,
+                           grouping_var,
+                           method = FALSE,
+                           mean = FALSE,
+                           pop_es = NULL,
+                           bin_width = 0.1) {
   es_col <- df[, deparse(substitute(es))]
 
   dat_b <- df %>%
@@ -81,8 +90,8 @@ esd_plot_group <- function(df, es, es_type, grouping_var, method = FALSE, mean =
                            values = c(q25 = "#F8B195",
                                       q50 = "#F67280",
                                       q75 = "#C06C84",
-                                      q4 = "#7DAA92"),
-                           labels = c(q25_label, q50_label, q75_label, "Mean"))
+                                      mean = "#7DAA92"),
+                           labels = c(q25 = q25_label, q50 = q50_label, q75 = q75_label, mean = "Mean"))
       } else if (method == "thirds") {
         plot <- plot+
           geom_vline(aes(xintercept = q16, color = "q16"), linetype = "dashed", size = 1) +
@@ -92,8 +101,8 @@ esd_plot_group <- function(df, es, es_type, grouping_var, method = FALSE, mean =
                              values = c(q16 = "#F8B195",
                                         q50 = "#F67280",
                                         q83 = "#C06C84",
-                                        q4 = "#7DAA92"),
-                             labels = c(q16_label, q50_label, q83_label, "Mean"))
+                                        mean = "#7DAA92"),
+                             labels = c(q16 = q16_label, q50 = q50_label, q83 = q83_label, mean = "Mean"))
       } else {
         return("Please enter a valid method")
       }
@@ -104,7 +113,7 @@ esd_plot_group <- function(df, es, es_type, grouping_var, method = FALSE, mean =
   }
   if (mean == TRUE) {
     plot <- plot +
-      geom_vline(aes(xintercept = mean, color = "q4"), linetype = "dotted", size = 1)
+      geom_vline(aes(xintercept = mean, color = "mean"), linetype = "dotted", size = 1)
   } else {
     plot <- plot
   }

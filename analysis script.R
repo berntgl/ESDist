@@ -87,3 +87,38 @@ esd_table_pba(dat_abs, yi, adj_es_test_ma, grouping_var=meta_analysis)
 
 
 esd_table_pba(dat_filt, yi, 0.1)
+
+
+
+
+
+
+
+
+
+dat_filt <- dat %>%
+  group_by(study_doi, group) %>%
+  filter(sei == min(sei)) %>%
+  filter(abs(yi) == min(abs(yi))) %>%
+  filter(group %in% c("ASD", "healthy", "SCZ")) %>%
+  ungroup()
+
+dat_filt_abs <- dat_filt
+dat_filt_abs$yi <- abs(dat_filt_abs$yi)
+dat_filt_abs <- as.data.frame(dat_filt_abs)
+
+
+load_all()
+p <- esd_plot_group(dat_filt_abs, yi, "Cohen's d", group, method = "quads", mean = TRUE)
+p
+
+esd_table(dat_filt_abs, yi, group)
+
+# affective disorders (depression)
+# psychosis and bipolar disorder (scz)
+# neurodevelopmental (asd)
+# somatic (diabetes)
+#
+#
+# healthy vs disorder
+

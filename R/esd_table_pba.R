@@ -16,7 +16,12 @@
 #' @examples
 #' esd_table_pba(df, es, 0.2, grouping_var = group, method = "thirds")
 #'
-esd_table_pba <- function(df, es, adj_es, grouping_var = NULL, method = "quads", csv_write = FALSE) {
+esd_table_pba <- function(df,
+                          es,
+                          adj_es,
+                          grouping_var = NULL,
+                          method = "quads",
+                          csv_write = FALSE) {
   if(missing(grouping_var)) {
     es_median <- median(df[, deparse(substitute(es))], na.rm = TRUE)
     adj_es_med <- es_median - 1.135 * (mean(df[, deparse(substitute(es))], na.rm = TRUE) - adj_es)
