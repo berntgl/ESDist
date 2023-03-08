@@ -6,9 +6,11 @@
 #'   "Cohen's d")
 #' @param method Defaults to FALSE, can also be 'thirds' for 16.65th, 50th, and
 #'   83.35th percentiles, or 'quads' for 25th, 50th, and 75th percentiles.
-#' @param mean Defaults to FALSE, but will insert a ggplot geom_vline element
-#'   that corresponds to the mean effect size
-#' @param pop_es #' @param pop_es A numeric argument that corresponds to the population ES of
+#' @param mean Defaults to NULL, but will insert a ggplot geom_vline element
+#'   that corresponds to the mean effect size if set to 'mean' or takes on
+#'   a numeric argument to generate a geom_vline element that corresponds to
+#'   the inputted value.
+#' @param esoi A numeric argument that corresponds to the population ES of
 #'   interest. This will split the histogram into two parts around the inputted
 #'   value.
 #' @param bin_width Numeric argument that corresponds to the bin width for the
@@ -17,35 +19,35 @@
 #' @return A ggplot object
 #' @export
 #'
-#' @examples esd_plot(df, es, es_type = "Cohen's d", method = "thirds", pop)
+#' @examples esd_plot(df, es, es_type = "Cohen's d", method = "thirds")
 esd_plot <- function(df,
                      es,
                      es_type,
                      method = FALSE,
-                     mean = FALSE,
-                     pop_es = NULL,
+                     mean = NULL,
+                     esoi = NULL,
                      bin_width = 0.1) {
   es_col <- df[, deparse(substitute(es))]
 
-  if (missing(pop_es)){
+  if (missing(esoi)){
     plot <- ggplot(data = df, aes(es_col)) +
       geom_histogram(fill = "#355C7D", binwidth = bin_width) +
-      scale_x_continuous(breaks = seq(0, 3, 0.5)) +
+      #scale_x_continuous(breaks = seq(0, 3, 0.5)) +
       labs(x = es_type, y = "Frequency")+
       theme_minimal() +
       theme(axis.text = element_text(size=12),
             axis.title = element_text(size=20))
   } else {
-    rank <- length(es_col[es_col <= pop_es])/length(es_col) * 100
+    rank <- length(es_col[es_col <= esoi])/length(es_col) * 100
     rank_rev <- 100 - rank
 
     rank_perc <- sprintf("%.2f%%", rank)
     rank_rev_perc <- sprintf("%.2f%%", rank_rev)
 
     plot <- ggplot(data = df) +
-      geom_histogram(aes(es_col, fill = stat(x) > pop_es),
+      geom_histogram(aes(es_col, fill = after_stat(x) > esoi),
                      binwidth = bin_width) +
-      scale_fill_manual(name = sprintf("ES < or > %.2f", pop_es),
+      scale_fill_manual(name = sprintf("ES < or > %.2f", esoi),
                         labels = c(rank_perc, rank_rev_perc),
                         values = c("#EEE0CB", "#355C7D")) +
       labs(x = es_type, y = "Frequency")+
@@ -80,9 +82,12 @@ esd_plot <- function(df,
                  linetype = "dashed",
                  size = 1) +
       scale_color_manual(name = "Percentiles",
-                         values = c(q1 = "#F8B195", q2 = "#F67280",
-                                    q3 = "#C06C84", q4 = "#7DAA92"),
-                         labels = c(q1_label, q2_label, q3_label, "Mean"))+
+                         values = c(q1 = "#F8B195",
+                                    q2 = "#F67280",
+                                    q3 = "#C06C84"),
+                         labels = c(q1 = q1_label,
+                                    q2 = q2_label,
+                                    q3 = q3_label))+
       theme(legend.position = c(0.9, 0.7),
             legend.background = element_rect(fill="#dde7f0",
                                              color = "#dde7f0"))
@@ -105,9 +110,12 @@ esd_plot <- function(df,
                    linetype = "dashed",
                    size = 1) +
         scale_color_manual(name = "Percentiles",
-                           values = c(q1 = "#F8B195", q2 = "#F67280",
-                                      q3 = "#C06C84", q4 = "#7DAA92"),
-                           labels = c(q1_label, q2_label, q3_label, "Mean"))+
+                           values = c(q1 = "#F8B195",
+                                      q2 = "#F67280",
+                                      q3 = "#C06C84"),
+                           labels = c(q1 = q1_label,
+                                      q2 = q2_label,
+                                      q3 = q3_label))+
         theme(legend.position = c(0.9, 0.7),
               legend.background = element_rect(fill="#dde7f0",
                                                color = "#dde7f0"))
@@ -119,10 +127,18 @@ esd_plot <- function(df,
   } else {
     return("Please enter a valid method")
   }
-  if (mean == TRUE) {
-    plot <- plot +
-      geom_vline(aes(xintercept = mean(es_col), color = "q4"),
-                 linetype = "dotted", size = 1)
+  if (!missing(mean)) {
+    if (mean == "mean") {
+      plot <- plot +
+        geom_vline(aes(xintercept = mean(es_col)), color = "#7DAA92",
+                   linetype = "dotted", size = 1)
+    } else if (is.numeric(mean)) {
+      plot <- plot +
+        geom_vline(aes(xintercept = mean), color = "#7DAA92",
+                   linetype = "dotted", size = 1)
+    } else {
+      return("Please enter a valid mean value")
+    }
   } else {
     plot <- plot
   }

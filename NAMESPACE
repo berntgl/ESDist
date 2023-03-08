@@ -2,6 +2,5 @@
 
 export(esd_plot)
 export(esd_plot_group)
-export(esd_plot_perc)
 export(esd_table)
 export(esd_table_pba)

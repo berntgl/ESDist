@@ -13,3 +13,6 @@ Imports:
     ggplot2,
     grid,
     gridExtra
+Depends: 
+    R (>= 2.10)
+LazyData: true

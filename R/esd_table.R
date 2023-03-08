@@ -7,7 +7,7 @@
 #' @param csv_write Defaults to FALSE. Will write the outputted table as a csv
 #' when set to TRUE.
 #'
-#' @return a matrix
+#' @return a table
 #' @export
 #'
 #' @examples

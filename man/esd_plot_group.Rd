@@ -11,7 +11,6 @@ esd_plot_group(
   grouping_var,
   method = FALSE,
   mean = FALSE,
-  pop_es = NULL,
   bin_width = 0.1
 )
 }
@@ -30,10 +29,6 @@ esd_plot_group(
 \item{mean}{Defaults to FALSE, but will insert a ggplot geom_vline element
 that corresponds to the mean effect size}
 
-\item{pop_es}{A numeric argument that corresponds to the population ES of
-interest. This will split the histogram into two parts around the inputted
-value.}
-
 \item{bin_width}{Numeric argument that corresponds to the bin width for the
 histogram. Defaults to 0.1}
 }
@@ -42,4 +37,8 @@ A ggplot element
 }
 \description{
 Creating an ESD plot per group
+}
+\examples{
+esd_plot_group(df, es, grouping_var = group,
+es_type = "Cohen's d", method = "thirds")
 }

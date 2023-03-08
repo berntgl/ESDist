@@ -19,7 +19,7 @@ esd_table(df, es, grouping_var = NULL, method = "quads", csv_write = FALSE)
 when set to TRUE.}
 }
 \value{
-a matrix
+a table
 }
 \description{
 Creating a table for an effect size distribution

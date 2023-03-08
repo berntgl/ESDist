@@ -9,8 +9,8 @@ esd_plot(
   es,
   es_type,
   method = FALSE,
-  mean = FALSE,
-  pop_es = NULL,
+  mean = NULL,
+  esoi = NULL,
   bin_width = 0.1
 )
 }
@@ -25,10 +25,12 @@ esd_plot(
 \item{method}{Defaults to FALSE, can also be 'thirds' for 16.65th, 50th, and
 83.35th percentiles, or 'quads' for 25th, 50th, and 75th percentiles.}
 
-\item{mean}{Defaults to FALSE, but will insert a ggplot geom_vline element
-that corresponds to the mean effect size}
+\item{mean}{Defaults to NULL, but will insert a ggplot geom_vline element
+that corresponds to the mean effect size if set to 'mean' or takes on
+a numeric argument to generate a geom_vline element that corresponds to
+the inputted value.}
 
-\item{pop_es}{#' @param pop_es A numeric argument that corresponds to the population ES of
+\item{esoi}{A numeric argument that corresponds to the population ES of
 interest. This will split the histogram into two parts around the inputted
 value.}
 
@@ -42,5 +44,5 @@ A ggplot object
 Creating a plot for an effect size distribution
 }
 \examples{
-esd_plot(df, es, es_type = "Cohen's d", method = "thirds", pop)
+esd_plot(df, es, es_type = "Cohen's d", method = "thirds")
 }
