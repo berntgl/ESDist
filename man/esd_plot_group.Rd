@@ -11,6 +11,7 @@ esd_plot_group(
   grouping_var,
   method = FALSE,
   mean = FALSE,
+  min_group_size = 20,
   bin_width = 0.1
 )
 }
@@ -28,6 +29,9 @@ esd_plot_group(
 
 \item{mean}{Defaults to FALSE, but will insert a ggplot geom_vline element
 that corresponds to the mean effect size}
+
+\item{min_group_size}{Numeric value corresponding to the minimum amount of
+effect sizes for a group to be included in the plot. Defaults to 20.}
 
 \item{bin_width}{Numeric argument that corresponds to the bin width for the
 histogram. Defaults to 0.1}

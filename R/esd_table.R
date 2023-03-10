@@ -4,8 +4,12 @@
 #' @param es Column name of effect sizes
 #' @param grouping_var Column name of grouping variable
 #' @param method Defaults to 'quads', can also be 'thirds'
+#' @param min_group_size Sets the minimum amount of effect sizes needed to
+#' include a group in the table. Defaults to 4.
 #' @param csv_write Defaults to FALSE. Will write the outputted table as a csv
 #' when set to TRUE.
+#' @param file_name A string to generate a name for the table if csv_write is
+#' set to TRUE. Defaults to "esd_table.csv".
 #'
 #' @return a table
 #' @export
@@ -19,7 +23,8 @@ esd_table <- function(df,
                       grouping_var = NULL,
                       method = "quads",
                       min_group_size = 4,
-                      csv_write = FALSE) {
+                      csv_write = FALSE,
+                      file_name = "esd_table.csv") {
   df <- as.data.frame(df)
   if(missing(grouping_var)) {
     if(method == "quads") {
@@ -100,7 +105,7 @@ esd_table <- function(df,
 
 
   if (csv_write == TRUE) {
-    write.csv(es_table, file = "esd_table.csv")
+    write.csv(es_table, file = file_name)
   }
   return(es_table)
 }

@@ -8,6 +8,8 @@
 #' @param method Defaults to FALSE, but can be 'quads' or 'thirds'
 #' @param mean Defaults to FALSE, but will insert a ggplot geom_vline element
 #'   that corresponds to the mean effect size
+#' @param min_group_size Numeric value corresponding to the minimum amount of
+#' effect sizes for a group to be included in the plot. Defaults to 20.
 #' @param bin_width Numeric argument that corresponds to the bin width for the
 #'   histogram. Defaults to 0.1
 #'

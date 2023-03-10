@@ -20,8 +20,6 @@ library(devtools)
 devtools::install_github("berntgl/ESDist")
 library(ESDist)
 
-load_all()
-
 ot_dat$yi_abs <- abs(ot_dat$yi)
 # esd_plot() =================================
 
@@ -130,30 +128,20 @@ plot6
 # dat_groups. We then create a second dataset with only absolute effect
 # sizes, called dat_groups_abs.
 
-ot_dat_groups <- ot_dat %>%
-  group_by(study_doi, group) %>%
-  filter(sei == min(sei)) %>%
-  filter(abs(yi) == min(abs(yi))) %>%
-  filter(group %in% c("ASD", "healthy", "SCZ")) %>%
-  ungroup()
-
-ot_dat_groups$yi_abs <- abs(ot_dat_groups$yi)
-ot_dat_groups <- as.data.frame(ot_dat_groups)
 
 # Now that we have our datasets, we can start comparing groups. First we create
 # a simple plot for each group. We save the figure to a variable called plot7.
-load_all()
+
 plot7 <- esd_plot_group(df = ot_dat,
                     es = yi,
                     es_type = "Hedges' g",
-                    grouping_var = group,
-                    min_group_size = 18)
+                    grouping_var = group)
 plot7
 
 # We will now calculate and plot a vertical line for the mean of each group and save the
 # figure to a variable called plot8.
 
-plot8 <- esd_plot_group(df = dat_groups,
+plot8 <- esd_plot_group(df = ot_dat,
                         es = yi,
                         es_type = "Hedges' g",
                         grouping_var = group,
@@ -167,8 +155,8 @@ plot8
 # approcah (note that it is also possible to use the thirds approach). We store
 # the figure in a variable called plot9.
 
-plot9 <- esd_plot_group(df = dat_groups_abs,
-                        es = yi,
+plot9 <- esd_plot_group(df = ot_dat,
+                        es = yi_abs,
                         es_type = "Hedges' g",
                         grouping_var = group,
                         method = 'quads')
@@ -179,18 +167,6 @@ plot9
 # Another interesting comparison within our dataset is between within-subjects
 # and between-subjects study designs. Below, we create new datasets and plot
 # a figure in which we can compare the two
-
-dat_design <- dat %>%
-  group_by(study_doi, group) %>%
-  filter(sei == min(sei)) %>%
-  filter(abs(yi) == min(abs(yi))) %>%
-  filter(design %in% c("Within", "Between")) %>%
-  ungroup()
-
-dat_design_abs <- dat_design
-dat_design_abs$yi <- abs(dat_groups$yi)
-dat_design_abs <- as.data.frame(dat_groups_abs)
-
 
 plot10 <- esd_plot_group(df = ot_dat,
                         es = yi,
@@ -217,6 +193,11 @@ plot11
 # benchmarks and displays the number of effects that were used in the
 # calculation. We save the result to a variable called table1.
 
+table1a <- esd_table(df = ot_dat,
+                     es = yi_abs)
+
+table1a
+
 table1b <- esd_table(df = ot_dat,
                     es = yi_abs,
                     method = "thirds")
@@ -240,7 +221,7 @@ table2
 # grouping variable in the function as well. In this case, we also get a summary
 # of all effect sizes in the bottom row. We save the results to a variable
 # called table3.
-load_all()
+
 table2a <- esd_table(df = ot_dat,
                      es = yi_abs,
                      grouping_var = group)
@@ -261,8 +242,8 @@ table3a <- esd_table(df = ot_dat,
 
 table3a
 
-  table3b <- esd_table(df = dat_filt_abs,
-                     es = yi,
+table3b <- esd_table(df = ot_dat,
+                     es = yi_abs,
                      grouping_var = design,
                      method = "thirds")
 
@@ -328,8 +309,8 @@ table5 <- esd_table_pba(df = dat_groups_abs,
 table5
 
 
-ggsave(plot1,
-       file = '../../Documents/Thesis/Figures/plot1.png',
+ggsave(plot11,
+       file = '../../Documents/Thesis/Figures/plot11.png',
        width = 10,
        height = 7,
        dpi = 300

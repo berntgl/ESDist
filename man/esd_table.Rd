@@ -4,7 +4,15 @@
 \alias{esd_table}
 \title{Creating a table for an effect size distribution}
 \usage{
-esd_table(df, es, grouping_var = NULL, method = "quads", csv_write = FALSE)
+esd_table(
+  df,
+  es,
+  grouping_var = NULL,
+  method = "quads",
+  min_group_size = 4,
+  csv_write = FALSE,
+  file_name = "esd_table.csv"
+)
 }
 \arguments{
 \item{df}{Dataset}
@@ -15,8 +23,14 @@ esd_table(df, es, grouping_var = NULL, method = "quads", csv_write = FALSE)
 
 \item{method}{Defaults to 'quads', can also be 'thirds'}
 
+\item{min_group_size}{Sets the minimum amount of effect sizes needed to
+include a group in the table. Defaults to 4.}
+
 \item{csv_write}{Defaults to FALSE. Will write the outputted table as a csv
 when set to TRUE.}
+
+\item{file_name}{A string to generate a name for the table if csv_write is
+set to TRUE. Defaults to "esd_table.csv".}
 }
 \value{
 a table
