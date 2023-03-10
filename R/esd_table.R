@@ -18,6 +18,7 @@ esd_table <- function(df,
                       es,
                       grouping_var = NULL,
                       method = "quads",
+                      min_group_size = 4,
                       csv_write = FALSE) {
   df <- as.data.frame(df)
   if(missing(grouping_var)) {
@@ -81,6 +82,8 @@ esd_table <- function(df,
       return("Please enter a valid method")
     }
 
+    es_values <- es_values %>%
+      filter(count >= min_group_size)
     es_values <- as.matrix(es_values)
     es_table <- matrix(nrow = nrow(es_values), ncol = 4)
     rownames(es_table) <- as.character(es_values[,1])

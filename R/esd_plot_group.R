@@ -23,6 +23,7 @@ esd_plot_group <- function(df,
                            grouping_var,
                            method = FALSE,
                            mean = FALSE,
+                           min_group_size = 20,
                            bin_width = 0.1) {
   df <- as.data.frame(df)
   es_col <- df[, deparse(substitute(es))]
@@ -34,7 +35,9 @@ esd_plot_group <- function(df,
            q25 = quantile({{es}}, prob = 0.25),
            q50 = quantile({{es}}, prob = 0.50),
            q75 = quantile({{es}}, prob = 0.75),
-           q83 = quantile({{es}}, prob = 0.8335),) %>%
+           q83 = quantile({{es}}, prob = 0.8335),
+           count = n()) %>%
+    filter(count >= min_group_size) %>%
     ungroup()
   q16_label <- "16.65th"
   q25_label <- "25th"

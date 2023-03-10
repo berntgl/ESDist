@@ -14,15 +14,15 @@ library(ggplot2)
 # Demonstrating package ---------------------------------
 
 # Load all the functions from the R package
-load_all()
+# load_all()
 
 library(devtools)
 devtools::install_github("berntgl/ESDist")
 library(ESDist)
 
+load_all()
 
 ot_dat$yi_abs <- abs(ot_dat$yi)
-ot_dat <- ot_dat
 # esd_plot() =================================
 
 
@@ -63,7 +63,7 @@ plot2
 plot3 <- esd_plot(df = ot_dat, #we will now use absolute ES values only
                   es = yi_abs,
                   es_type = "Hedges' g",
-                  method = "thirds")
+                  method = "quads")
 
 plot3
 
@@ -75,7 +75,7 @@ quantile(ot_dat$yi_abs, probs = .8335) # large, d = 0.754
 plot4 <- esd_plot(df = ot_dat, #we will now use absolute ES values only
                   es = yi_abs,
                   es_type = "Hedges' g",
-                  method = "quads")
+                  method = "thirds")
 
 plot4
 
@@ -143,10 +143,11 @@ ot_dat_groups <- as.data.frame(ot_dat_groups)
 # Now that we have our datasets, we can start comparing groups. First we create
 # a simple plot for each group. We save the figure to a variable called plot7.
 load_all()
-plot7 <- esd_plot_group(df = ot_dat_groups,
+plot7 <- esd_plot_group(df = ot_dat,
                     es = yi,
                     es_type = "Hedges' g",
-                    grouping_var = group)
+                    grouping_var = group,
+                    min_group_size = 18)
 plot7
 
 # We will now calculate and plot a vertical line for the mean of each group and save the
@@ -239,7 +240,7 @@ table2
 # grouping variable in the function as well. In this case, we also get a summary
 # of all effect sizes in the bottom row. We save the results to a variable
 # called table3.
-
+load_all()
 table2a <- esd_table(df = ot_dat,
                      es = yi_abs,
                      grouping_var = group)

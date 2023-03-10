@@ -21,6 +21,7 @@ esd_table_pba <- function(df,
                           adj_es,
                           grouping_var = NULL,
                           method = "quads",
+                          min_group_size = 4,
                           csv_write = FALSE) {
   df <- as.data.frame(df)
   if(missing(grouping_var)) {
@@ -114,6 +115,9 @@ esd_table_pba <- function(df,
     } else {
       return("please enter a valid method")
     }
+    adj_values <- adj_values %>%
+      filter(count >= min_group_size)
+
     adj_values <- as.matrix(adj_values)
 
     adj_table <- matrix(nrow = 2 * nrow(adj_values), ncol = 4)
