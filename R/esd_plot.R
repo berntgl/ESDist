@@ -27,6 +27,7 @@ esd_plot <- function(df,
                      mean = NULL,
                      esoi = NULL,
                      bin_width = 0.1) {
+  df <- as.data.frame(df)
   es_col <- df[, deparse(substitute(es))]
 
   if (missing(esoi)){

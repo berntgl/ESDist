@@ -24,6 +24,7 @@ esd_plot_group <- function(df,
                            method = FALSE,
                            mean = FALSE,
                            bin_width = 0.1) {
+  df <- as.data.frame(df)
   es_col <- df[, deparse(substitute(es))]
 
   dat_b <- df %>%

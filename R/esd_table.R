@@ -19,6 +19,7 @@ esd_table <- function(df,
                       grouping_var = NULL,
                       method = "quads",
                       csv_write = FALSE) {
+  df <- as.data.frame(df)
   if(missing(grouping_var)) {
     if(method == "quads") {
       es_values <- df %>%

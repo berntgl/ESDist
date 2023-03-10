@@ -3,9 +3,6 @@
 library(dplyr)
 library(devtools)
 library(ggplot2)
-library(gridExtra)
-
-setwd("../ESDist")
 
 # Loading and filtering data ---------------------------------
 
@@ -19,17 +16,21 @@ setwd("../ESDist")
 # Load all the functions from the R package
 load_all()
 
-# library(devtools)
-# devtools::install_github("berntgl/ESDist")
-# library(ESDist)
+library(devtools)
+devtools::install_github("berntgl/ESDist")
+library(ESDist)
 
+
+ot_dat$yi_abs <- abs(ot_dat$yi)
+ot_dat <- ot_dat
 # esd_plot() =================================
+
 
 # First, we will Plot the effect size distribution (ESD) and save it to a
 # variable called 'plot1'
 plot1 <- esd_plot(df = ot_dat,
                   es = yi,
-                  es_type = "Cohen's d")
+                  es_type = "Hedges' g")
 plot1
 
 
@@ -44,7 +45,7 @@ abs_mean
 
 plot2 <- esd_plot(df = ot_dat,
                   es = yi,
-                  es_type = "Cohen's d",
+                  es_type = "Hedges' g",
                   mean = "mean")
 
 plot2
@@ -61,7 +62,7 @@ plot2
 
 plot3 <- esd_plot(df = ot_dat, #we will now use absolute ES values only
                   es = yi_abs,
-                  es_type = "Cohen's d",
+                  es_type = "Hedges' g",
                   method = "thirds")
 
 plot3
@@ -73,7 +74,7 @@ quantile(ot_dat$yi_abs, probs = .8335) # large, d = 0.754
 
 plot4 <- esd_plot(df = ot_dat, #we will now use absolute ES values only
                   es = yi_abs,
-                  es_type = "Cohen's d",
+                  es_type = "Hedges' g",
                   method = "quads")
 
 plot4
@@ -96,7 +97,7 @@ quantile(ot_dat$yi_abs, probs = .75) # large, d = 0.550
 
 plot5 <- esd_plot(df = ot_dat, #we will now use absolute ES values only
                   es = yi_abs,
-                  es_type = "Cohen's d",
+                  es_type = "Hedges' g",
                   esoi = 0.2)
 
 plot5
@@ -111,7 +112,7 @@ plot5
 
 plot6 <- esd_plot(df = ot_dat, #we will now use absolute ES values only
                   es = yi_abs,
-                  es_type = "Cohen's d",
+                  es_type = "Hedges' g",
                   method = "quads",
                   mean = true_mean,
                   esoi = 0.2)
@@ -144,7 +145,7 @@ ot_dat_groups <- as.data.frame(ot_dat_groups)
 load_all()
 plot7 <- esd_plot_group(df = ot_dat_groups,
                     es = yi,
-                    es_type = "Cohen's d",
+                    es_type = "Hedges' g",
                     grouping_var = group)
 plot7
 
@@ -153,7 +154,7 @@ plot7
 
 plot8 <- esd_plot_group(df = dat_groups,
                         es = yi,
-                        es_type = "Cohen's d",
+                        es_type = "Hedges' g",
                         grouping_var = group,
                         mean = 'mean')
 
@@ -167,7 +168,7 @@ plot8
 
 plot9 <- esd_plot_group(df = dat_groups_abs,
                         es = yi,
-                        es_type = "Cohen's d",
+                        es_type = "Hedges' g",
                         grouping_var = group,
                         method = 'quads')
 
@@ -192,13 +193,14 @@ dat_design_abs <- as.data.frame(dat_groups_abs)
 
 plot10 <- esd_plot_group(df = ot_dat,
                         es = yi,
-                        es_type = "Cohen's d",
-                        grouping_var = design)
+                        es_type = "Hedges' g",
+                        grouping_var = design,
+                        mean = "mean")
 plot10
 
 plot11 <- esd_plot_group(df = ot_dat,
                         es = yi_abs,
-                        es_type = "Cohen's d",
+                        es_type = "Hedges' g",
                         grouping_var = design,
                         method = 'quads')
 
@@ -214,10 +216,11 @@ plot11
 # benchmarks and displays the number of effects that were used in the
 # calculation. We save the result to a variable called table1.
 
-table1 <- esd_table(df = dat_filt_abs,
-                    es = yi)
+table1b <- esd_table(df = ot_dat,
+                    es = yi_abs,
+                    method = "thirds")
 
-table1
+table1b
 
 
 # This function defaults to the quads method, which means that it calculates
@@ -237,18 +240,32 @@ table2
 # of all effect sizes in the bottom row. We save the results to a variable
 # called table3.
 
-table3 <- esd_table(df = dat_filt_abs,
-                    es = yi,
-                    grouping_var = group)
+table2a <- esd_table(df = ot_dat,
+                     es = yi_abs,
+                     grouping_var = group)
 
-table3
+table2a
+
+table2b <- esd_table(df = ot_dat,
+                     es = yi_abs,
+                     grouping_var = group,
+                     method = "thirds")
+
+table2b
 
 
-table4 <- esd_table(df = dat_filt_abs,
-                    es = yi,
+table3a <- esd_table(df = ot_dat,
+                    es = yi_abs,
                     grouping_var = design)
 
-table4
+table3a
+
+  table3b <- esd_table(df = dat_filt_abs,
+                     es = yi,
+                     grouping_var = design,
+                     method = "thirds")
+
+table3b
 
 # If we want to save this table as a .csv file by adding another argument to our
 # function. By setting csv_write = TRUE, we save our table as a .csv file called

@@ -2,7 +2,7 @@
 \alias{ot_dat_raw}
 \docType{data}
 \title{
-Raw data from oxytocin administration studies
+Data from oxytocin administration studies
 }
 \description{
 %%  ~~ A concise (1-5 lines) description of the dataset. ~~
