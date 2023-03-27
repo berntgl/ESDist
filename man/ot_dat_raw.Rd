@@ -2,7 +2,7 @@
 \alias{ot_dat_raw}
 \docType{data}
 \title{
-Data from oxytocin administration studies
+Unfiltered data from oxytocin administration studies
 }
 \description{
 %%  ~~ A concise (1-5 lines) description of the dataset. ~~
@@ -39,10 +39,21 @@ Data from oxytocin administration studies
 %%  ~~ If necessary, more details than the __description__ above ~~
 }
 \source{
-Yang et al., 2021; Sabe et al., 2021; Peled-Avron et al., 2018;
-Ooi et al., 2017; Leslie et al., 2018; Leppanen et al., 2018; Leppanen et
-al., 2017; Keech et al., 2018; Kang et al., 2023; Huang et al., 2021; Chen
-et al., 2021; Bakermans-Kranenburg et al., 2018.
+ [1] "10.1038/tp.2013.34"
+ [2] "10.1016/j.clnu.2021.08.011"
+ [3] "10.1016/j.neubiorev.2020.12.028"
+ [4] "10.31219/osf.io/8fzdy"
+ [5] "10.1016/j.psyneuen.2017.09.022"
+ [6] "10.1016/j.neubiorev.2017.04.010"
+ [7] "10.1016/j.jad.2017.08.041"
+ [8] "10.1111/jne.12584"
+ [9] "10.1055/s-0042-109400"
+[10] "10.1016/j.neubiorev.2020.04.023"
+[11] "10.1093/ijnp/pyab020"
+[12] "10.1093/ijnp/pyab020 "
+[13] "10.1016/j.rasd.2019.03.007"
+[14] "10.1016/j.neubiorev.2021.03.033"
+[15] "10.1016/j.schres.2018.12.007"
 }
 \references{
 %%  ~~ possibly secondary sources and usages ~~
