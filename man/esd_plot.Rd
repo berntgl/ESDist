@@ -10,7 +10,7 @@ esd_plot(
   es_type,
   method = FALSE,
   mean = NULL,
-  esoi = NULL,
+  sesoi = NULL,
   bin_width = 0.1
 )
 }
@@ -30,7 +30,7 @@ that corresponds to the mean effect size if set to 'mean' or takes on
 a numeric argument to generate a geom_vline element that corresponds to
 the inputted value.}
 
-\item{esoi}{A numeric argument that corresponds to the population ES of
+\item{sesoi}{A numeric argument that corresponds to the population ES of
 interest. This will split the histogram into two parts around the inputted
 value.}
 
