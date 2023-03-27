@@ -10,7 +10,7 @@
 #'   that corresponds to the mean effect size if set to 'mean' or takes on
 #'   a numeric argument to generate a geom_vline element that corresponds to
 #'   the inputted value.
-#' @param esoi A numeric argument that corresponds to the population ES of
+#' @param sesoi A numeric argument that corresponds to the population ES of
 #'   interest. This will split the histogram into two parts around the inputted
 #'   value.
 #' @param bin_width Numeric argument that corresponds to the bin width for the
@@ -25,12 +25,12 @@ esd_plot <- function(df,
                      es_type,
                      method = FALSE,
                      mean = NULL,
-                     esoi = NULL,
+                     sesoi = NULL,
                      bin_width = 0.1) {
   df <- as.data.frame(df)
   es_col <- df[, deparse(substitute(es))]
 
-  if (missing(esoi)){
+  if (missing(sesoi)){
     plot <- ggplot(data = df, aes(es_col)) +
       geom_histogram(fill = "#355C7D", binwidth = bin_width) +
       #scale_x_continuous(breaks = seq(0, 3, 0.5)) +
@@ -39,16 +39,16 @@ esd_plot <- function(df,
       theme(axis.text = element_text(size=12),
             axis.title = element_text(size=20))
   } else {
-    rank <- length(es_col[es_col <= esoi])/length(es_col) * 100
+    rank <- length(es_col[es_col <= sesoi])/length(es_col) * 100
     rank_rev <- 100 - rank
 
     rank_perc <- sprintf("%.2f%%", rank)
     rank_rev_perc <- sprintf("%.2f%%", rank_rev)
 
     plot <- ggplot(data = df) +
-      geom_histogram(aes(es_col, fill = after_stat(x) > esoi),
+      geom_histogram(aes(es_col, fill = after_stat(x) > sesoi),
                      binwidth = bin_width) +
-      scale_fill_manual(name = sprintf("ES < or > %.2f", esoi),
+      scale_fill_manual(name = sprintf("ES < or > %.2f", sesoi),
                         labels = c(rank_perc, rank_rev_perc),
                         values = c("#EEE0CB", "#355C7D")) +
       labs(x = es_type, y = "Frequency")+
