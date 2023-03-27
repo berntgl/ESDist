@@ -20,7 +20,6 @@ library(devtools)
 devtools::install_github("berntgl/ESDist")
 library(ESDist)
 
-ot_dat$yi_abs <- abs(ot_dat$yi)
 # esd_plot() =================================
 
 
@@ -54,9 +53,12 @@ plot2
 # method and the "thirds" method that was used by Schäfer and Schwarz (2019).
 # When we want to calculate such benchmarks, we need to use the absolute effect
 # sizes only, because we are interested in only the size of each effect, not
-# the direction. Below, we save a plot using the thirds method to a variable
-# called plot3, and a plot using the quads method to a variable called plot4.
-# We will also calculate the corresponding values for each percentile
+# the direction. Below, we first create a column in our dataset called yi_abs,
+# which contains only absolute effect sizes. We then save a plot using the
+# thirds method to a variable called plot3, and a plot using the quads method
+# to a variable called plot4. We will also calculate the corresponding values
+# for each percentile
+
 
 plot3 <- esd_plot(df = ot_dat, #we will now use absolute ES values only
                   es = yi_abs,
@@ -121,16 +123,12 @@ plot6
 # esd_plot_group() =================================
 
 # Our dataset has several subgroups (e.g., healthy participants, ASD,
-# Schizophrenia, etc.) that we might want to compare. Although, theoretically,
-# we could compare all groups, some groups only have one or a few studies. As
-# such, these groups are not very informative. In the code below, we first
-# filter out the ASD, healthy, and SCZ groups and save it to a dataset called
-# dat_groups. We then create a second dataset with only absolute effect
-# sizes, called dat_groups_abs.
-
-
-# Now that we have our datasets, we can start comparing groups. First we create
-# a simple plot for each group. We save the figure to a variable called plot7.
+# Schizophrenia, etc.) that we might want to compare. In the code below we
+# compare plots for each group and save the figure to a variable called plot7.
+# Although, theoretically,we could compare all groups, some groups only have
+# one or a few studies. As such, these groups are not very informative. The
+# esd_plot_group() function therefore only includes groups with at least 20
+# studies
 
 plot7 <- esd_plot_group(df = ot_dat,
                     es = yi,
@@ -138,8 +136,8 @@ plot7 <- esd_plot_group(df = ot_dat,
                     grouping_var = group)
 plot7
 
-# We will now calculate and plot a vertical line for the mean of each group and save the
-# figure to a variable called plot8.
+# We will now calculate and plot a vertical line for the mean of each group and
+# save the figure to a variable called plot8.
 
 plot8 <- esd_plot_group(df = ot_dat,
                         es = yi,
@@ -162,6 +160,19 @@ plot9 <- esd_plot_group(df = ot_dat,
                         method = 'quads')
 
 plot9
+
+# In case we want to include groups with fewer studies, we can also specify
+# min_group_size to a value smaller than its default (20). The code below is
+# exactly the same as for plot9, except that all groups with at least 15
+# studies are included.
+plot9b <- esd_plot_group(df = ot_dat,
+                        es = yi_abs,
+                        es_type = "Hedges' g",
+                        grouping_var = group,
+                        method = 'quads',
+                        min_group_size = 15)
+
+plot9b
 
 
 # Another interesting comparison within our dataset is between within-subjects
@@ -249,69 +260,16 @@ table3b <- esd_table(df = ot_dat,
 
 table3b
 
-# If we want to save this table as a .csv file by adding another argument to our
-# function. By setting csv_write = TRUE, we save our table as a .csv file called
-# esd_table.csv to the directory we specify in our R environment. Below, we
-# copied the definition of table3, but added the command to save the table as
-# a .csv file.
+# We can save this table as a .csv file by adding another argument to our
+# function. By setting csv_write = TRUE, and by specifying a file_name argument,
+# we save our table as a .csv file to the directory we specify in our R
+# environment. Below, we copied the definition of table3, but added the command
+# to save the table as a .csv file.
 
 table3 <- esd_table(df = dat_filt_abs,
                     es = yi,
                     grouping_var = group,
-                    csv_write = TRUE)
+                    csv_write = TRUE,
+                    file_name = "table3.csv")
 
 
-# esd_table_pba() =================================
-
-# Whenever we are dealing with empirical results, there is a severe possibility
-# that there is bias in the data we are working with. One of the best ways to
-# detect and adjust for this bias, is through Robust Meta-analysis. In the code
-# below, we call the RoBMA package and use it on our data to determine the
-# evidence for the presence of bias, as well as to calculate an adjusted
-# average effect size.
-
-library(RoBMA)
-
-fit <- RoBMA(d = dat_filt$yi,
-             se = dat_filt$sei,
-             study_names = dat_filt$study,
-             seed = 2333)
-summary(fit)
-
-
-# Based on these results, the adjusted effect size is 0.13. By using the
-# esd_table_pba() function, we can estimate effect size benchmarks based on
-# this adjusted effect size. It takes mostly the same arguments as the
-# esd_table() function, with the addition of an adj_es argument, which
-# corresponds to our adjusted effect size for this data. Below, we calculate
-# the adjusted effect size benchmarks using the quads method and our adjusted
-# effect size. We save the results to a variable called table 4.
-
-table4 <- esd_table_pba(df = dat_filt_abs,
-                        es = yi,
-                        adj_es = 0.13)
-
-table4
-
-
-# By calculating the adjusted effect size for each group of interest (as well
-# as our overall data), and then passing those adjusted effect sizes into a
-# vector, we can also compare our adjusted benchmarks estimates between groups.
-# Below, we use our dat_groups dataframe, calculate the adjusted benchmarks per
-# group, and pass the results into a variable called table5.
-
-adj_es_groups <- c(0.10, 0.12, 0.14, 0.13)
-
-table5 <- esd_table_pba(df = dat_groups_abs,
-                        es = yi,
-                        adj_es = adj_es_groups,
-                        grouping_var = group)
-table5
-
-
-ggsave(plot11,
-       file = '../../Documents/Thesis/Figures/plot11.png',
-       width = 10,
-       height = 7,
-       dpi = 300
-)
