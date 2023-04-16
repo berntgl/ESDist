@@ -1,14 +1,8 @@
 # Loading libraries ---------------------------------
-
+install.packages("dplyr", "ggplot2")
 library(dplyr)
 library(devtools)
 library(ggplot2)
-
-# Loading and filtering data ---------------------------------
-
-# Now we have two datasets. dat_filt will have all effect sizes where positive
-# effects favour oxytocin and negative effects do not favour oxytocin.
-# dat_filt_abs will have absolute values only.
 
 
 # Demonstrating package ---------------------------------
@@ -19,6 +13,62 @@ library(ggplot2)
 library(devtools)
 devtools::install_github("berntgl/ESDist")
 library(ESDist)
+
+# Loading and filtering data =================================
+
+# The ESDist package includes two data files; ot_dat_raw, which contains all
+# effect sizes from the included meta-analyses, and ot_dat, which is the
+# filtered version of that data. The code below demonstrates how the data can
+# be filtered using the ci_to_se() helper function.
+
+#load data
+ot_dat_raw <- ot_dat_raw
+
+# We create a new dataset called ot_dat, which we will filter.
+ot_dat <- ot_dat_raw
+
+# We will convert some effect sizes, so we create a new column with effect
+# sizes as they were reported.
+ot_dat$raw_es <- ot_dat$yi
+
+# We also give every single effect size an ID, so we know which ones are
+# eventually filtered out.
+ot_dat$ID <- seq.int(nrow(ot_dat))
+
+# We calculate Standard error for each effect size from the 95% CI.
+ot_dat$sei[is.na(ot_dat$sei)] <- ci_to_se(ot_dat$lower[is.na(ot_dat$sei)], ot_dat$upper[is.na(ot_dat$sei)])
+
+# Next, we convert all effect sizes we can to Cohen's d, based on group sizes.
+# We use the des() function from the compute.es package.
+library(compute.es)
+ot_dat$yi <- des(d=raw_es, n.1=n1, n.2=n2, id=ID, data=ot_dat)[,13]
+
+# Because we converted some effect sizes that were already reported as Hedges'
+# g, we will overwrite those effect sizes with the raw effect size.
+ot_dat$yi[ot_dat$es_type == "Hedges' g"] <- ot_dat$raw_es[ot_dat$es_type == "Hedges' g"]
+
+# We will also include effect sizes reported in Cohen's d that have more than
+# 20 participants, as these effect size are somewhat comparable to Hedges' g.
+ot_dat$yi[ot_dat$n_total >= 20 & is.na(ot_dat$yi)] <- ot_dat$raw_es[ot_dat$n_total >= 20 & is.na(ot_dat$yi)]
+
+# Filter out the effect sizes with lowest SE per group per study (some studies
+# have multiple groups), and the effects with the lowest SE. In case some
+# effects from the same study have the same SE, we only use the effect size
+# that is closest to zero in absolute terms.
+ot_dat <- ot_dat %>%
+  group_by(study_doi, group) %>%
+  filter(!is.na(yi)) %>%
+  filter(sei == min(sei)) %>%
+  filter(abs(yi) == min(abs(yi))) %>%
+  ungroup()
+
+# Finally, we add a column with only absolute effect sizes, called yi_abs.
+ot_dat$yi_abs <- abs(ot_dat$yi)
+
+# The filtering process messes up the data type a bit, so let's turn it back
+# into a dataframe
+ot_dat <- as.data.frame(ot_dat)
+
 
 # esd_plot() =================================
 
@@ -37,7 +87,7 @@ plot1
 true_mean <- mean(ot_dat$yi)
 true_mean
 
-abs_mean <- mean(dat_filt_abs$yi)
+abs_mean <- mean(ot_dat$yi_abs)
 abs_mean
 
 plot2 <- esd_plot(df = ot_dat,
@@ -98,7 +148,7 @@ quantile(ot_dat$yi_abs, probs = .75) # large, d = 0.550
 plot5 <- esd_plot(df = ot_dat, #we will now use absolute ES values only
                   es = yi_abs,
                   es_type = "Hedges' g",
-                  esoi = 0.2)
+                  sesoi = 0.2)
 
 plot5
 
@@ -115,7 +165,7 @@ plot6 <- esd_plot(df = ot_dat, #we will now use absolute ES values only
                   es_type = "Hedges' g",
                   method = "quads",
                   mean = true_mean,
-                  esoi = 0.2)
+                  sesoi = 0.2)
 
 plot6
 
@@ -202,7 +252,12 @@ plot11
 # function, we need to use the dataset with absolute values only. Below, we
 # create a table that calculates the small, medium, and large effect size
 # benchmarks and displays the number of effects that were used in the
-# calculation. We save the result to a variable called table1.
+# calculation. We save the result to a variable called table1a.
+# This function defaults to the quads method, which means that it calculates
+# the 25th, 50th, and 75th percentiles to correspond to small, medium, and
+# large effect sizes respectively. It is also possible to use the thirds method
+# by adding method = 'thirds'. In this case, we calculate the 16.65th, 50th, and
+# 83.35th percentiles. We save the result to a variable called table1b.
 
 table1a <- esd_table(df = ot_dat,
                      es = yi_abs)
@@ -216,28 +271,18 @@ table1b <- esd_table(df = ot_dat,
 table1b
 
 
-# This function defaults to the quads method, which means that it calculates
-# the 25th, 50th, and 75th percentiles to correspond to small, medium, and
-# large effect sizes respectively. It is also possible to use the thirds method
-# by adding method = 'thirds'. In this case, we calculate the 16.65th, 50th, and
-# 83.35th percentiles. We save the result to a variable called table2.
-
-table2 <- esd_table(df = dat_filt_abs,
-                    es = yi,
-                    method = 'thirds')
-
-table2
 
 # In case we want to compare benchmarks between groups, we can define our
 # grouping variable in the function as well. In this case, we also get a summary
 # of all effect sizes in the bottom row. We save the results to a variable
-# called table3.
+# called table2a (or table2b for the thirds method).
 
 table2a <- esd_table(df = ot_dat,
                      es = yi_abs,
                      grouping_var = group)
 
 table2a
+
 
 table2b <- esd_table(df = ot_dat,
                      es = yi_abs,
@@ -246,6 +291,11 @@ table2b <- esd_table(df = ot_dat,
 
 table2b
 
+
+# In some cases, we might want to compare between different variables, like
+# study design. Here we compare studies with within- and between-subject
+# designs and store the results in a variable called table3a (and table3b for
+# the thirds approach).
 
 table3a <- esd_table(df = ot_dat,
                     es = yi_abs,

@@ -31,8 +31,6 @@ Unfiltered data from oxytocin administration studies
     \item{\code{n2}}{a numeric vector}
     \item{\code{n_total}}{a numeric vector}
     \item{\code{es_type}}{a character vector}
-    \item{\code{raw_es}}{a numeric vector}
-    \item{\code{ID}}{a numeric vector}
   }
 }
 \details{
