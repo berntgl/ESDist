@@ -219,8 +219,7 @@ plot9b <- esd_plot_group(df = ot_dat,
                         es = yi_abs,
                         es_type = "Hedges' g",
                         grouping_var = group,
-                        method = 'quads',
-                        min_group_size = 15)
+                        method = 'quads')
 
 plot9b
 
