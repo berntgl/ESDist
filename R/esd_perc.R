@@ -14,6 +14,6 @@ esd_perc <- function(df,
                      value) {
     df <- as.data.frame(df)
     es_col <- df[, deparse(substitute(es))]
-    perc <- length(es_col[es_col < value])/length(es_col) * 100
+    perc <- length(es_col[es_col <= value])/length(es_col) * 100
     return(perc)
 }
