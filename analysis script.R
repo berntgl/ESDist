@@ -321,4 +321,14 @@ table3 <- esd_table(df = dat_filt_abs,
                     csv_write = TRUE,
                     file_name = "table3.csv")
 
+# esd_perc() =================================
+
+# If we want to very simply calculate the percentile of a specific value, we
+# can use the esd_perc() function. In the code below we calculate the percentile
+# corresponding to g = 0.2. Note that we use yi_abs, as we are only interested
+# in the size of all effects, not in their direction.
+
+esd_perc(df = dat,
+         es = yi_abs,
+         value = 0.2)
 

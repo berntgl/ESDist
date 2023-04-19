@@ -39,7 +39,7 @@ esd_plot <- function(df,
       theme(axis.text = element_text(size=12),
             axis.title = element_text(size=20))
   } else {
-    rank <- length(es_col[es_col <= sesoi])/length(es_col) * 100
+    rank <- length(es_col[es_col < sesoi])/length(es_col) * 100
     rank_rev <- 100 - rank
 
     rank_perc <- sprintf("%.2f%%", rank)
