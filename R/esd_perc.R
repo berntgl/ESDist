@@ -11,9 +11,25 @@
 #' @examples esd_perc(dat, yi, 0.2)
 esd_perc <- function(df,
                      es,
-                     value) {
+                     value,
+                     method = "exclusive") {
     df <- as.data.frame(df)
     es_col <- df[, deparse(substitute(es))]
-    perc <- length(es_col[es_col <= value])/length(es_col) * 100
-    return(perc)
+
+    if (method == "exclusive") {
+      rank <- length(es_col[es_col < value])
+      perc <- rank/length(es_col) * 100
+      return(perc)
+    } else if (method == "inclusive") {
+      rank <- length(es_col[es_col <= value])
+      perc <- rank/length(es_col) * 100
+      return(perc)
+    } else if (method == "grouped") {
+      rank <- length(es_col[es_col < value]) + (length(es_col[es_col == value]) / 2)
+      perc <- rank/length(es_col) * 100
+      return(perc)
+    } else {
+      return("please enter a valid method")
+    }
+
 }
