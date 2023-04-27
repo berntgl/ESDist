@@ -1,8 +1,10 @@
-#' Title
+#' Calculate the percentile of an ESD corresponding to a specific value
 #'
 #' @param df Dataset
 #' @param es Column name of effect sizes
 #' @param value The value of the effect size of interest
+#' @param method Specifies method, defaults to 'exclusive' but can also be
+#' 'inclusive' or 'grouped'.
 #'
 #' @return A value which describes to which percentile in the ESD the inputted
 #' value corresponds

@@ -22,10 +22,10 @@ library(ESDist)
 # be filtered using the ci_to_se() helper function.
 
 #load data
-ot_dat_raw <- ot_dat_raw
+dat <- ot_dat_raw
 
 # We create a new dataset called ot_dat, which we will filter.
-ot_dat <- ot_dat_raw
+ot_dat <- dat
 
 # We will convert some effect sizes, so we create a new column with effect
 # sizes as they were reported.
@@ -38,18 +38,20 @@ ot_dat$ID <- seq.int(nrow(ot_dat))
 # We calculate Standard error for each effect size from the 95% CI.
 ot_dat$sei[is.na(ot_dat$sei)] <- ci_to_se(ot_dat$lower[is.na(ot_dat$sei)], ot_dat$upper[is.na(ot_dat$sei)])
 
-# Next, we convert all effect sizes we can to Cohen's d, based on group sizes.
-# We use the des() function from the compute.es package.
-library(compute.es)
-ot_dat$yi <- des(d=raw_es, n.1=n1, n.2=n2, id=ID, data=ot_dat)[,13]
+# Next, we convert all effect sizes we can to Hedges' g d, based on group sizes.
+# We use the simplified unbias factor given by Hedges (1981), which is based on
+# the degrees of freedom, which are calculated differently based on study
+# design. First we calculate the df for each effect size and add them to a df
+# column. Next, we calculate all effect sizes based on Hedges' factor and round
+# each effect size to two decimal places.
 
-# Because we converted some effect sizes that were already reported as Hedges'
-# g, we will overwrite those effect sizes with the raw effect size.
-ot_dat$yi[ot_dat$es_type == "Hedges' g"] <- ot_dat$raw_es[ot_dat$es_type == "Hedges' g"]
+ot_dat$df[ot_dat$design == 'Between'] <- ot_dat$n1[ot_dat$design == 'Between'] + ot_dat$n2[ot_dat$design == 'Between'] - 2
+ot_dat$df[ot_dat$design == 'Within'] <- ot_dat$n_total[ot_dat$design == 'Within'] - 1
 
-# We will also include effect sizes reported in Cohen's d that have more than
-# 20 participants, as these effect size are somewhat comparable to Hedges' g.
-ot_dat$yi[ot_dat$n_total >= 20 & is.na(ot_dat$yi)] <- ot_dat$raw_es[ot_dat$n_total >= 20 & is.na(ot_dat$yi)]
+ot_dat$yi[ot_dat$es_type != "Hedges' g"] <- ot_dat$raw_es[ot_dat$es_type != "Hedges' g"] * (1-3/(4*ot_dat$df[ot_dat$es_type != "Hedges' g"] - 1))
+
+ot_dat$yi <- round(ot_dat$yi, digits = 3)
+
 
 # Filter out the effect sizes with lowest SE per group per study (some studies
 # have multiple groups), and the effects with the lowest SE. In case some
@@ -117,9 +119,9 @@ plot3 <- esd_plot(df = ot_dat, #we will now use absolute ES values only
 
 plot3
 
-quantile(ot_dat$yi_abs, probs = .1665) # small, d = 0.033
-quantile(ot_dat$yi_abs, probs = .5) # medium, d = 0.243
-quantile(ot_dat$yi_abs, probs = .8335) # large, d = 0.754
+quantile(ot_dat$yi_abs, probs = .25) # small, d = 0.064
+quantile(ot_dat$yi_abs, probs = .5) # medium, d = 0.244
+quantile(ot_dat$yi_abs, probs = .75) # large, d = 0.515
 
 
 plot4 <- esd_plot(df = ot_dat, #we will now use absolute ES values only
@@ -129,9 +131,10 @@ plot4 <- esd_plot(df = ot_dat, #we will now use absolute ES values only
 
 plot4
 
-quantile(ot_dat$yi_abs, probs = .25) # small, d = 0.067
+
+quantile(ot_dat$yi_abs, probs = .1665) # small, d = 0.033
 quantile(ot_dat$yi_abs, probs = .5) # medium, d = 0.243
-quantile(ot_dat$yi_abs, probs = .75) # large, d = 0.550
+quantile(ot_dat$yi_abs, probs = .8335) # large, d = 0.754
 
 
 

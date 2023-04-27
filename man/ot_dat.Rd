@@ -2,14 +2,14 @@
 \alias{ot_dat}
 \docType{data}
 \title{
-Data from oxytocin administration studies
+%%   ~~ data name/kind ... ~~
 }
 \description{
 %%  ~~ A concise (1-5 lines) description of the dataset. ~~
 }
 \usage{data("ot_dat")}
 \format{
-  A data frame with 150 observations on the following 23 variables.
+  A data frame with 182 observations on the following 24 variables.
   \describe{
     \item{\code{meta_analysis}}{a character vector}
     \item{\code{meta_analysis_doi}}{a character vector}
@@ -33,6 +33,7 @@ Data from oxytocin administration studies
     \item{\code{es_type}}{a character vector}
     \item{\code{raw_es}}{a numeric vector}
     \item{\code{ID}}{a numeric vector}
+    \item{\code{df}}{a numeric vector}
     \item{\code{yi_abs}}{a numeric vector}
   }
 }

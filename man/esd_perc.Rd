@@ -2,9 +2,9 @@
 % Please edit documentation in R/esd_perc.R
 \name{esd_perc}
 \alias{esd_perc}
-\title{Title}
+\title{Calculate the percentile of an ESD corresponding to a specific value}
 \usage{
-esd_perc(df, es, value)
+esd_perc(df, es, value, method = "exclusive")
 }
 \arguments{
 \item{df}{Dataset}
@@ -12,13 +12,16 @@ esd_perc(df, es, value)
 \item{es}{Column name of effect sizes}
 
 \item{value}{The value of the effect size of interest}
+
+\item{method}{Specifies method, defaults to 'exclusive' but can also be
+'inclusive' or 'grouped'.}
 }
 \value{
 A value which describes to which percentile in the ESD the inputted
 value corresponds
 }
 \description{
-Title
+Calculate the percentile of an ESD corresponding to a specific value
 }
 \examples{
 esd_perc(dat, yi, 0.2)
