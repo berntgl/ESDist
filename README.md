@@ -43,7 +43,7 @@ plot1 <- esd_plot(df = ot_dat,
 plot1
 ```
 
-![](man/figures/README-unnamed-chunk-3-1.png)<!-- -->
+<img src="man/figures/README-unnamed-chunk-3-1.png" width="100%" />
 
 By adding `mean = "mean"`, we can plot the true mean of this
 distribution.
@@ -57,7 +57,7 @@ plot2 <- esd_plot(df = ot_dat,
 plot2
 ```
 
-![](man/figures/README-unnamed-chunk-4-1.png)<!-- -->
+<img src="man/figures/README-unnamed-chunk-4-1.png" width="100%" />
 
 ### Plot effect size benchmarks
 
@@ -75,7 +75,7 @@ plot3 <- esd_plot(df = ot_dat,
 plot3
 ```
 
-![](man/figures/README-unnamed-chunk-5-1.png)<!-- -->
+<img src="man/figures/README-unnamed-chunk-5-1.png" width="100%" />
 
 ### Plot empirical effect size ranges
 
@@ -92,7 +92,7 @@ plot4 <- esd_plot(df = ot_dat,
 plot4
 ```
 
-![](man/figures/README-unnamed-chunk-6-1.png)<!-- -->
+<img src="man/figures/README-unnamed-chunk-6-1.png" width="100%" />
 
 ## esd_plot_group()
 
@@ -111,7 +111,7 @@ plot5 <- esd_plot_group(df = ot_dat,
 plot5
 ```
 
-![](man/figures/README-unnamed-chunk-7-1.png)<!-- -->
+<img src="man/figures/README-unnamed-chunk-7-1.png" width="100%" />
 
 ### Plot effect size benchmarks per group.
 
@@ -130,7 +130,7 @@ plot6 <- esd_plot_group(df = ot_dat,
 plot6
 ```
 
-![](man/figures/README-unnamed-chunk-8-1.png)<!-- -->
+<img src="man/figures/README-unnamed-chunk-8-1.png" width="100%" />
 
 ## esd_table()
 
