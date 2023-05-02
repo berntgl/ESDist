@@ -47,7 +47,7 @@ library(dplyr)
 library(ggplot2)
 ```
 
-```{r, out.height = "70%"}
+```{r, fig.height = 7}
 plot1 <- esd_plot(df = ot_dat,
          es = yi,
          es_type = "Hedges' g")
@@ -58,7 +58,7 @@ plot1
 
 By adding `mean = "mean"`, we can plot the true mean of this distribution.
 
-```{r, out.height = "70%"}
+```{r, fig.height = 7}
 plot2 <- esd_plot(df = ot_dat,
          es = yi,
          es_type = "Hedges' g",
@@ -75,7 +75,7 @@ It is also possible to plot effect size benchmarks based on the 25th, 50th, and
 and 83.35th percentiles by adding `method = "thirds"`). Note that only absolute 
 effect sizes are used to accomplish this.
 
-```{r, out.height = "70%"}
+```{r, fig.height = 7}
 plot3 <- esd_plot(df = ot_dat,
          es = yi_abs,
          es_type = "Hedges' g",
@@ -91,7 +91,7 @@ Finally, we can specify the range of effect sizes that is equal to or larger
 than a specified `sesoi`. Note that only absolute effect sizes are used to 
 accomplish this.
 
-```{r, out.height = "70%"}
+```{r, fig.height = 7}
 plot4 <- esd_plot(df = ot_dat,
          es = yi_abs,
          es_type = "Hedges' g",
