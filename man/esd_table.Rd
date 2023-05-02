@@ -9,9 +9,10 @@ esd_table(
   es,
   grouping_var = NULL,
   method = "quads",
-  min_group_size = 4,
+  min_group_size = 3,
   csv_write = FALSE,
-  file_name = "esd_table.csv"
+  path_file_name = "esd_table.csv",
+  ndec = 2
 )
 }
 \arguments{
@@ -24,13 +25,17 @@ esd_table(
 \item{method}{Defaults to 'quads', can also be 'thirds'}
 
 \item{min_group_size}{Sets the minimum amount of effect sizes needed to
-include a group in the table. Defaults to 4.}
+include a group in the table. Defaults to 3.}
 
-\item{csv_write}{Defaults to FALSE. Will write the outputted table as a csv
+\item{csv_write}{Defaults to FALSE. Will write the outputted table as a csv}
+
+\item{path_file_name}{A string containing the directory to which the .csv
+file will be saved, including the title of the .csv file (has to end in
+'.csv')}
+
+\item{ndec}{The number of decimal places in which all values should be
+reported. Defaults to 2.
 when set to TRUE.}
-
-\item{file_name}{A string to generate a name for the table if csv_write is
-set to TRUE. Defaults to "esd_table.csv".}
 }
 \value{
 a table
@@ -39,7 +44,7 @@ a table
 Creating a table for an effect size distribution
 }
 \examples{
-esd_table(df, es, grouping_var = group, method = "thirds")
+esd_table(ot_dat, yi_abs, grouping_var = group, method = "thirds")
 
 
 }

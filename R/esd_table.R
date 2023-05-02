@@ -5,26 +5,29 @@
 #' @param grouping_var Column name of grouping variable
 #' @param method Defaults to 'quads', can also be 'thirds'
 #' @param min_group_size Sets the minimum amount of effect sizes needed to
-#' include a group in the table. Defaults to 4.
+#' include a group in the table. Defaults to 3.
 #' @param csv_write Defaults to FALSE. Will write the outputted table as a csv
+#' @param path_file_name A string containing the directory to which the .csv
+#' file will be saved, including the title of the .csv file (has to end in
+#' '.csv')
+#' @param ndec The number of decimal places in which all values should be
+#' reported. Defaults to 2.
 #' when set to TRUE.
-#' @param file_name A string to generate a name for the table if csv_write is
-#' set to TRUE. Defaults to "esd_table.csv".
-#'
 #' @return a table
 #' @export
 #'
 #' @examples
-#' esd_table(df, es, grouping_var = group, method = "thirds")
+#' esd_table(ot_dat, yi_abs, grouping_var = group, method = "thirds")
 #'
 #'
 esd_table <- function(df,
                       es,
                       grouping_var = NULL,
                       method = "quads",
-                      min_group_size = 4,
+                      min_group_size = 3,
                       csv_write = FALSE,
-                      file_name = "esd_table.csv") {
+                      path_file_name = "esd_table.csv",
+                      ndec = 2) {
   df <- as.data.frame(df)
   if(missing(grouping_var)) {
     if(method == "quads") {
@@ -48,7 +51,7 @@ esd_table <- function(df,
 
 
     for (i in 1:3) {
-      es_table[i] <- format(round(as.numeric(es_values[i]), 3), nsmall = 3)
+      es_table[i] <- format(round(as.numeric(es_values[i]), ndec), nsmall = ndec)
     }
     es_table[1,4] <- as.numeric(es_values[1,4])
 
@@ -94,7 +97,7 @@ esd_table <- function(df,
     rownames(es_table) <- as.character(es_values[,1])
     for (i in 1:nrow(es_values)) {
       for (j in 1:3) {
-        es_table[i,j] <- format(round(as.numeric(es_values[i, j+1]), 3), nsmall = 3)
+        es_table[i,j] <- format(round(as.numeric(es_values[i, j+1]), ndec), nsmall = ndec)
       }
       es_table[i,4] <- as.numeric(es_values[i,5])
     }
@@ -105,7 +108,7 @@ esd_table <- function(df,
 
 
   if (csv_write == TRUE) {
-    write.csv(es_table, file = file_name)
+    write.csv(es_table, file = path_file_name)
   }
   return(es_table)
 }

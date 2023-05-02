@@ -16,7 +16,7 @@
 #' @return A ggplot element
 #' @export
 #'
-#' @examples esd_plot_group(df, es, grouping_var = group,
+#' @examples esd_plot_group(ot_dat, yi_abs, grouping_var = group,
 #' es_type = "Cohen's d", method = "thirds")
 
 esd_plot_group <- function(df,

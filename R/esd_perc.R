@@ -10,7 +10,7 @@
 #' value corresponds
 #' @export
 #'
-#' @examples esd_perc(dat, yi, 0.2)
+#' @examples esd_perc(ot_dat, yi, 0.2)
 esd_perc <- function(df,
                      es,
                      value,

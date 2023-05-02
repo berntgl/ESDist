@@ -24,5 +24,5 @@ value corresponds
 Calculate the percentile of an ESD corresponding to a specific value
 }
 \examples{
-esd_perc(dat, yi, 0.2)
+esd_perc(ot_dat, yi, 0.2)
 }

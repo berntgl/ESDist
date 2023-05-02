@@ -43,6 +43,6 @@ A ggplot element
 Creating an ESD plot per group
 }
 \examples{
-esd_plot_group(df, es, grouping_var = group,
+esd_plot_group(ot_dat, yi_abs, grouping_var = group,
 es_type = "Cohen's d", method = "thirds")
 }

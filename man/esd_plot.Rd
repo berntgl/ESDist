@@ -44,5 +44,5 @@ A ggplot object
 Creating a plot for an effect size distribution
 }
 \examples{
-esd_plot(df, es, es_type = "Cohen's d", method = "thirds")
+esd_plot(ot_dat, yi, es_type = "Cohen's d", method = "thirds")
 }

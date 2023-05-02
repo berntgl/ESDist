@@ -262,7 +262,9 @@ plot11
 # 83.35th percentiles. We save the result to a variable called table1b.
 
 table1a <- esd_table(df = ot_dat,
-                     es = yi_abs)
+                     es = yi_abs,
+                     csv_write = TRUE,
+                     file_name = "table1a.csv")
 
 table1a
 

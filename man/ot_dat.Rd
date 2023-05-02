@@ -2,7 +2,7 @@
 \alias{ot_dat}
 \docType{data}
 \title{
-%%   ~~ data name/kind ... ~~
+Data from Oxytocin adminsitration studies
 }
 \description{
 %%  ~~ A concise (1-5 lines) description of the dataset. ~~

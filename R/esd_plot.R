@@ -19,7 +19,7 @@
 #' @return A ggplot object
 #' @export
 #'
-#' @examples esd_plot(df, es, es_type = "Cohen's d", method = "thirds")
+#' @examples esd_plot(ot_dat, yi, es_type = "Cohen's d", method = "thirds")
 esd_plot <- function(df,
                      es,
                      es_type,
