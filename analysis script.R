@@ -246,6 +246,44 @@ plot11 <- esd_plot_group(df = ot_dat,
 
 plot11
 
+# esd_plot_pba() =================================
+
+# Unfortunately, a lot of published empirical results are prone to biases, such
+# as publication bias. The metasens package (Schwarzer et al., 2023) uses
+# limit meta-analysis to adjust individual effect sizes for publication bias.
+# using the esd_plot_pba() function, we can plot the distribution of adjusted
+# effect sizes against the distribution of unadjusted effect sizes. First, we
+# create a meta-object (m1), based on the effect sizes and corresponding
+# standard error in our dataset. Next, we create an object of class 'limitmeta',
+# (l1) which we can then use in our esd_plot_pba() function. The resulting plot
+# automatically generates a visualisation for the summary effect size and the
+# corresponding 95% CI.
+
+library(meta)
+library(metasens)
+
+m1 <- metagen(TE = ot_dat$yi, seTE = ot_dat$sei)
+l1 <- limitmeta(m1)
+
+plot12 <- esd_plot_pba(l1, "Hedges' g")
+
+
+# If we want to change the summary effect size visualisation, we can specify the
+# sum_es_type argument. The other option is a dot with error bars. We save the
+# result to plot13.
+
+plot13 <- esd_plot_pba(l1, "Hedges' g", sum_es_type = "dot")
+
+# We can also choose to remove this visualisation altogether by setting sum_es
+# to FALSE. We save the result to plot14.
+
+plot14 <- esd_plot_pba(l1, "Hedges' g", sum_es = FALSE)
+
+# Finally, we can also visualise the adjusted effect size benchmarks for our
+# distribution. We save the result to plot15.
+
+plot15 <- esd_plot_pba(l1, "Hedges' g", method = "quads")
+
 
 # esd_table() =================================
 
@@ -336,4 +374,6 @@ table3 <- esd_table(df = dat_filt_abs,
 esd_perc(df = dat,
          es = yi_abs,
          value = 0.2)
+
+
 

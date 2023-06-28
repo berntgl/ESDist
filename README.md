@@ -132,6 +132,59 @@ plot6
 
 <img src="man/figures/README-unnamed-chunk-8-1.png" width="100%" />
 
+## esd_plot_pba()
+
+### Plot an adjusted ESD against a raw ESD.
+
+Using the `meta` and `metasens` packages (Schwarzer et al., 2023), we
+can adjust every individual effect size for publication bias, and plot
+the adjusted distribution against theraw distribution.
+
+First, we need to import the `meta` and `metasens` packages
+
+``` r
+library(meta)
+library(metasens)
+```
+
+Next, we create an object of class ‘meta’ (m1), and subsequently use
+this to create an object of class ‘limitmeta’ (l1).
+
+``` r
+m1 <- metagen(TE = ot_dat$yi, seTE = ot_dat$sei)
+l1 <- limitmeta(m1)
+```
+
+We can now use the `l1` object to create our distribution.
+
+``` r
+plot7 <- esd_plot_pba(l1, 
+          "Hedges' g")
+
+plot7
+#> Warning: The dot-dot notation (`..count..`) was deprecated in ggplot2 3.4.0.
+#> ℹ Please use `after_stat(count)` instead.
+#> ℹ The deprecated feature was likely used in the ESDist package.
+#>   Please report the issue to the authors.
+#> This warning is displayed once every 8 hours.
+#> Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
+#> generated.
+```
+
+<img src="man/figures/README-unnamed-chunk-11-1.png" width="100%" />
+
+Alternatively, we can plot the effect size benchmarks for both
+distributions.
+
+``` r
+plot8 <- esd_plot_pba(l1, 
+          "Hedges' g",
+          method = "quads")
+plot8
+```
+
+<img src="man/figures/README-unnamed-chunk-12-1.png" width="100%" />
+
 ## esd_table()
 
 ### Calculate effect size benchmarks for whole dataset

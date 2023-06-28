@@ -97,12 +97,12 @@ esd_plot_group <- function(df,
                                         q50 = q50_label,
                                         q83 = q83_label))
       } else {
-        return("Please enter a valid method")
+        return(warning("Please enter a valid method"))
       }
   } else if (isFALSE(method)) {
     plot <- plot
   } else {
-    return("Please enter a valid method")
+    return(warning("Please enter a valid method"))
   }
   if (!missing(mean)) {
     if (mean == "mean") {
@@ -114,7 +114,7 @@ esd_plot_group <- function(df,
         geom_vline(aes(xintercept = mean), color = "#7DAA92",
                    linetype = "dotted", size = 1)
     } else {
-      return("Please enter a valid mean value")
+      return(warning("Please enter a valid mean value"))
     }
   } else {
     plot <- plot

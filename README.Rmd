@@ -133,6 +133,44 @@ plot6 <- esd_plot_group(df = ot_dat,
 plot6
 ```
 
+## esd_plot_pba()
+### Plot an adjusted ESD against a raw ESD.
+Using the `meta` and `metasens` packages (Schwarzer et al., 2023), we can 
+adjust every individual effect size for publication bias, and plot the adjusted 
+distribution against theraw distribution. 
+
+First, we need to import the `meta` and `metasens` packages
+
+```{r, message=FALSE, warning=FALSE}
+library(meta)
+library(metasens)
+```
+
+Next, we create an object of class 'meta' (m1), and subsequently use this
+to create an object of class 'limitmeta' (l1). 
+
+```{r, message=FALSE, warning=FALSE}
+m1 <- metagen(TE = ot_dat$yi, seTE = ot_dat$sei)
+l1 <- limitmeta(m1)
+```
+
+We can now use the `l1` object to create our distribution.
+
+```{r, fig.height = 7}
+plot7 <- esd_plot_pba(l1, 
+          "Hedges' g")
+
+plot7
+```
+
+Alternatively, we can plot the effect size benchmarks for both distributions.
+
+```{r, fig.height = 7}
+plot8 <- esd_plot_pba(l1, 
+          "Hedges' g",
+          method = "quads")
+plot8
+```
 
 ## esd_table()
 ### Calculate effect size benchmarks for whole dataset

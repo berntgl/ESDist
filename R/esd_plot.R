@@ -121,12 +121,12 @@ esd_plot <- function(df,
               legend.background = element_rect(fill="#dde7f0",
                                                color = "#dde7f0"))
     } else {
-      return("Please enter a valid method")
+      return(warning("Please enter a valid method"))
     }
   } else if (isFALSE(method)) {
     plot <- plot
   } else {
-    return("Please enter a valid method")
+    return(warning("Please enter a valid method"))
   }
   if (!missing(mean)) {
     if (mean == "mean") {
@@ -138,7 +138,7 @@ esd_plot <- function(df,
         geom_vline(aes(xintercept = mean), color = "#7DAA92",
                    linetype = "dotted", size = 1)
     } else {
-      return("Please enter a valid mean value")
+      return(warning("Please enter a valid mean value"))
     }
   } else {
     plot <- plot
