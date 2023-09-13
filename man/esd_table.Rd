@@ -6,7 +6,7 @@
 \usage{
 esd_table(
   df,
-  es,
+  es_abs,
   grouping_var = NULL,
   method = "quads",
   min_group_size = 3,
@@ -17,8 +17,6 @@ esd_table(
 }
 \arguments{
 \item{df}{Dataset}
-
-\item{es}{Column name of effect sizes}
 
 \item{grouping_var}{Column name of grouping variable}
 
@@ -34,8 +32,9 @@ file will be saved, including the title of the .csv file (has to end in
 '.csv')}
 
 \item{ndec}{The number of decimal places in which all values should be
-reported. Defaults to 2.
-when set to TRUE.}
+reported. Defaults to 2.}
+
+\item{es}{Column name of effect sizes}
 }
 \value{
 a table

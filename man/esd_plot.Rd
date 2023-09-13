@@ -11,6 +11,7 @@ esd_plot(
   method = FALSE,
   mean = NULL,
   sesoi = NULL,
+  abs = FALSE,
   bin_width = 0.1
 )
 }
@@ -34,6 +35,9 @@ the inputted value.}
 interest. This will split the histogram into two parts around the inputted
 value.}
 
+\item{abs}{Defaults to FALSE. If set to TRUE, plots all effect sizes as
+absolute values}
+
 \item{bin_width}{Numeric argument that corresponds to the bin width for the
 histogram. Defaults to 0.1}
 }
@@ -44,5 +48,7 @@ A ggplot object
 Creating a plot for an effect size distribution
 }
 \examples{
-esd_plot(ot_dat, yi, es_type = "Cohen's d", method = "thirds")
+esd_plot(df = ot_dat,
+                   es = yi,
+                   es_type = "Cohen's d")
 }

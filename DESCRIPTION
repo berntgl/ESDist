@@ -16,5 +16,7 @@ Depends:
 LazyData: true
 Suggests: 
     knitr,
-    rmarkdown
+    rmarkdown,
+    meta,
+    metasens
 VignetteBuilder: knitr

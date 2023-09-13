@@ -11,6 +11,7 @@ esd_plot_group(
   grouping_var,
   method = FALSE,
   mean = FALSE,
+  abs = FALSE,
   min_group_size = 20,
   bin_width = 0.1
 )
@@ -30,6 +31,9 @@ esd_plot_group(
 \item{mean}{Defaults to FALSE, but will insert a ggplot geom_vline element
 that corresponds to the mean effect size}
 
+\item{abs}{Defaults to FALSE. If set to TRUE, plots all effect sizes as
+absolute values}
+
 \item{min_group_size}{Numeric value corresponding to the minimum amount of
 effect sizes for a group to be included in the plot. Defaults to 20.}
 
@@ -43,6 +47,8 @@ A ggplot element
 Creating an ESD plot per group
 }
 \examples{
-esd_plot_group(ot_dat, yi_abs, grouping_var = group,
-es_type = "Cohen's d", method = "thirds")
+esd_plot_group(df = ot_dat,
+                         es = yi,
+                         grouping_var = group,
+                         es_type = "Hedges' g")
 }

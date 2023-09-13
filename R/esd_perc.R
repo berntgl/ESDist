@@ -16,19 +16,19 @@ esd_perc <- function(df,
                      value,
                      method = "exclusive") {
     df <- as.data.frame(df)
-    es_col <- df[, deparse(substitute(es))]
+    es_col_abs <- abs(df[, deparse(substitute(es))])
 
     if (method == "exclusive") {
-      rank <- length(es_col[es_col < value])
-      perc <- rank/length(es_col) * 100
+      rank <- length(es_col_abs[es_col_abs < value])
+      perc <- rank/length(es_col_abs) * 100
       return(perc)
     } else if (method == "inclusive") {
-      rank <- length(es_col[es_col <= value])
-      perc <- rank/length(es_col) * 100
+      rank <- length(es_col_abs[es_col_abs <= value])
+      perc <- rank/length(es_col_abs) * 100
       return(perc)
     } else if (method == "grouped") {
-      rank <- length(es_col[es_col < value]) + (length(es_col[es_col == value]) / 2)
-      perc <- rank/length(es_col) * 100
+      rank <- length(es_col_abs[es_col_abs < value]) + (length(es_col_abs[es_col_abs == value]) / 2)
+      perc <- rank/length(es_col_abs) * 100
       return(perc)
     } else {
       return("please enter a valid method")

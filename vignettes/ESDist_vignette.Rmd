@@ -2,7 +2,7 @@
 title: "ESDist: Calculate and visualise field-specific ESDs"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{ESDist_vignette}
+  %\VignetteIndexEntry{ESDist: Calculate and visualise field-specific ESDs}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -26,15 +26,36 @@ The `ESDist` package is designed to calculate and visualise field-specific
 effect size distributions, based on data that can easily be obtained from 
 meta-analyses.
 
+[![DOI](https://zenodo.org/badge/532824630.svg)](https://zenodo.org/badge/latestdoi/532824630)
+
 
 ### Installation
 
-You can install the ESDist package from [GitHub](https://github.com/) with:
+You can install the `ESDist` package from [GitHub](https://github.com/) with:
 
 ``` r
 # install.packages("devtools")
+library(devtools)
 devtools::install_github("berntgl/ESDist")
 ```
+
+### Data structure
+
+The `ESDist` package is designed for datasets containing data that can easily 
+be extracted from pre-existing meta-analyses. As such, most functions in this 
+package work on a dataset that only contains a column with effect sizes. 
+However, for some functions and additional functionalities, users might want to 
+include some grouping variable or other study information. For the publication
+bias-adjusted functions, users need a column with the standard error for each
+study effect size. Alternatively, users can include a column with the lower 
+bound of the 95% confidence interval, and one for the upper bound. The `ot_dat` 
+dataset included in the `ESDist` package contains several columns in adition to 
+the effect size column (`yi`).
+
+```{r}
+head(ESDist::ot_dat)
+```
+
 
 ## esd_plot()
 ### Plot a simple ESD
@@ -48,7 +69,7 @@ library(dplyr)
 library(ggplot2)
 ```
 
-```{r}
+```{r, fig.height = 7}
 plot1 <- esd_plot(df = ot_dat,
          es = yi,
          es_type = "Hedges' g")
@@ -57,48 +78,34 @@ plot1
 ```
 
 
-By adding `mean = "mean"`, we can plot the true mean of this distribution.
-
-```{r}
-plot2 <- esd_plot(df = ot_dat,
-         es = yi,
-         es_type = "Hedges' g",
-         mean = "mean")
-
-plot2
-```
-
-
 ### Plot effect size benchmarks
 
 It is also possible to plot effect size benchmarks based on the 25th, 50th, and 
-75th percentiles by adding `method = "quads"` (or based on the 16.65th, 50thf, 
-and 83.35th percentiles by adding `method = "thirds"`). Note that only absolute 
-effect sizes are used to accomplish this.
+75th percentiles by adding `method = "quads"` (or based on the 16.65th, 50th, 
+and 83.35th percentiles by adding `method = "thirds"`).
 
-```{r}
-plot3 <- esd_plot(df = ot_dat,
-         es = yi_abs,
+```{r, fig.height = 7}
+plot2 <- esd_plot(df = ot_dat,
+         es = yi,
          es_type = "Hedges' g",
          method = "quads")
 
-plot3
+plot2
 ```
 
 
 ### Plot empirical effect size ranges
 
 Finally, we can specify the range of effect sizes that is equal to or larger 
-than a specified `sesoi`. Note that only absolute effect sizes are used to 
-accomplish this.
+than a specified `sesoi`.
 
-```{r}
-plot4 <- esd_plot(df = ot_dat,
-         es = yi_abs,
+```{r, fig.height = 7}
+plot3 <- esd_plot(df = ot_dat,
+         es = yi,
          es_type = "Hedges' g",
-         sesoi = 0.2)
+         sesoi = 0.3)
 
-plot4
+plot3
 ```
 
 
@@ -108,40 +115,85 @@ plot4
 The `esd_plot_group()` function allows for specifying a `grouping_var` to group 
 data and create plots for each group with 20 or more effect sizes. 
 
-```{r}
-plot5 <- esd_plot_group(df = ot_dat,
+```{r, fig.height = 7}
+plot4 <- esd_plot_group(df = ot_dat,
          es = yi,
          es_type = "Hedges' g",
          grouping_var = group)
 
-plot5
+plot4
 ```
 
 
 ### Plot effect size benchmarks per group.
 Like the `esd_plot()` function, the `esd_plot_group()` function lets you plot
 effect size benchmarks based on a specific set of percentiles, by adding 
-`method = "quads"` or `method = "thirds"`. Note that only absolute effect sizes
-are used to accomplish this.
+`method = "quads"` or `method = "thirds"`.
 
-```{r}
-plot6 <- esd_plot_group(df = ot_dat,
-         es = yi_abs,
+```{r, fig.height = 7}
+plot5 <- esd_plot_group(df = ot_dat,
+         es = yi,
          es_type = "Hedges' g",
          grouping_var = group,
-         method = "thirds")
+         method = "quads")
+
+plot5
+```
+
+## esd_plot_pba()
+### Plot an adjusted ESD against a raw ESD.
+Using the `meta` and `metasens` packages (Schwarzer et al., 2023), we can 
+adjust every individual effect size for publication bias, and plot the adjusted 
+distribution against theraw distribution. 
+
+First, we need to import the `meta` and `metasens` packages
+
+```{r, message=FALSE, warning=FALSE}
+library(meta)
+library(metasens)
+```
+
+Next, we create an object of class 'meta' (m1), and subsequently use this
+to create an object of class 'limitmeta' (l1). 
+
+```{r, message=FALSE, warning=FALSE}
+m1 <- metagen(TE = ot_dat$yi, seTE = ot_dat$sei)
+l1 <- limitmeta(m1)
+```
+
+We can now use the `l1` object to create our distribution.
+
+```{r, fig.height = 7}
+plot6 <- esd_plot_pba(lim_obj = l1, 
+          es_type = "Hedges' g")
 
 plot6
 ```
 
+Alternatively, we can plot the effect size benchmarks for both distributions.
+
+```{r, fig.height = 7}
+plot7 <- esd_plot_pba(lim_obj = l1, 
+          es_type = "Hedges' g",
+          method = "quads")
+plot7
+```
+
+Or the range of effect sizes larger than or equal to a SESOI
+
+```{r, fig.height = 7}
+plot8 <- esd_plot_pba(l1, 
+          "Hedges' g",
+          sesoi = 0.3)
+plot8
+```
 
 ## esd_table()
 ### Calculate effect size benchmarks for whole dataset
 By using the `esd_table()` function, you can calculate the effect size 
 benchmarks for your dataset by specifying the dataset (`df`), and the column 
 containing all effect sizes (`es`). This will give you the effect size 
-benchmarks based on the 25th, 50th, and 75th percentiles. Note that only 
-absolute effect sizes should be used.
+benchmarks based on the 25th, 50th, and 75th percentiles.
 
 ```{r, message=FALSE, warning=FALSE}
 library(ESDist)
@@ -150,22 +202,9 @@ library(dplyr)
 
 ```{r}
 table1 <- esd_table(df = ot_dat,
-                    es = yi_abs)
+                    es = yi)
 
 table1
-```
-
-Alternatively, you can calculate benchmarks by splitting the distribution into 
-three equal-sized chunks, and calculating the median of every third, which would
-correspond to the 16.65th, 50th, and 83.35th percentiles. This can be achieved
-by adding `method = "thirds"` to the code.
-
-```{r}
-table2 <- esd_table(df = ot_dat,
-                    es = yi_abs,
-                    method = "thirds")
-
-table2
 ```
 
 ### Calculate effect size benchmarks per group
@@ -176,10 +215,42 @@ required effect sizes per group can be overwritten by specifying
 
 ```{r}
 table3 <- esd_table(df = ot_dat,
-                    es = yi_abs,
+                    es = yi,
                     grouping_var = group)
 
 table3
+```
+
+
+## esd_table_pba()
+The `esd_table_pba()` function allows users to use an object of type `limitmeta`
+to calculate benchmarks based on effect sizes that are adjusted for publication
+bias. 
+
+```{r}
+table4 <- esd_table_pba(lim_obj = l1,
+                    es_type = "Hedges' g")
+
+table4
+```
+
+In case the user wants effect size benchmarks per group, the user should define
+the `subgroup` argument when defining the `meta` object:
+
+```{r, message=FALSE, warning=FALSE}
+m2 <- metagen(TE = ot_dat$yi, seTE = ot_dat$sei, subgroup = ot_dat$group)
+l2 <- limitmeta(m2)
+```
+
+Then, in the `esd_table_pba()` function, the `grouping` argument should be set
+to `TRUE`. 
+
+```{r}
+table5 <- esd_table_pba(lim_obj = l2,
+                    es_type = "Hedges' g",
+                    grouping = TRUE)
+
+table5
 ```
 
 ### Editing and saving tables
@@ -203,6 +274,7 @@ library(ggplot2)
 
 ```{r}
 esd_perc(df = ot_dat,
-         es = yi_abs,
-         value = 0.2)
+         es = yi,
+         value = 0.3)
 ```
+

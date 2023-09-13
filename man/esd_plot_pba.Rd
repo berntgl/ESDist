@@ -7,6 +7,7 @@
 esd_plot_pba(
   lim_obj,
   es_type,
+  sesoi = NULL,
   sum_es = TRUE,
   method = FALSE,
   abs = FALSE,
@@ -19,6 +20,10 @@ esd_plot_pba(
 
 \item{es_type}{A string describing the type of effect size used (e.g.,
 "Cohen's d")}
+
+\item{sesoi}{A numeric argument that corresponds to the population ES of
+interest. This will split the histogram into two parts around the inputted
+value.}
 
 \item{sum_es}{Defaults to TRUE. Plots the summary effect
 size and 95\% CI for both the distribution of raw effect sizes as well as
@@ -46,5 +51,5 @@ A ggplot object
 Creating an iceberg plot to visualise publication bias adjustment.
 }
 \examples{
-esd_plot_pba(l1, es_type = "Cohen's d", sum_es = TRUE)
+esd_plot_pba(lim_obj = l1, es_type = "Cohen's d", sum_es = TRUE)
 }

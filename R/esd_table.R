@@ -12,7 +12,6 @@
 #' '.csv')
 #' @param ndec The number of decimal places in which all values should be
 #' reported. Defaults to 2.
-#' when set to TRUE.
 #' @return a table
 #' @export
 #'
@@ -21,7 +20,7 @@
 #'
 #'
 esd_table <- function(df,
-                      es,
+                      es_abs,
                       grouping_var = NULL,
                       method = "quads",
                       min_group_size = 3,
@@ -29,25 +28,26 @@ esd_table <- function(df,
                       path_file_name = "esd_table.csv",
                       ndec = 2) {
   df <- as.data.frame(df)
+  df$es_abs <- abs(df[, deparse(substitute(es_abs))])
   if(missing(grouping_var)) {
     if(method == "quads") {
       es_values <- df %>%
-        summarise(cdq25 = quantile({{ es }}, prob = .25, na.rm = TRUE),
-                  cdq50 = quantile({{ es }}, prob = .50, na.rm = TRUE),
-                  cdq75 = quantile({{ es }}, prob = .75, na.rm = TRUE),
+        summarise(cdq25 = round(quantile(es_abs, prob = .25, na.rm = TRUE), ndec),
+                  cdq50 = round(quantile(es_abs, prob = .50, na.rm = TRUE), ndec),
+                  cdq75 = round(quantile(es_abs, prob = .75, na.rm = TRUE), ndec),
                   count = n())
     } else if (method == "thirds") {
       es_values <- df %>%
-        summarise(cdq16 = quantile({{ es }}, prob = .1665, na.rm = TRUE),
-                  cdq50 = quantile({{ es }}, prob = .50, na.rm = TRUE),
-                  cdq83 = quantile({{ es }}, prob = .8335, na.rm = TRUE),
+        summarise(cdq16 = round(quantile(es_abs, prob = .1665, na.rm = TRUE), ndec),
+                  cdq50 = round(quantile(es_abs, prob = .50, na.rm = TRUE), ndec),
+                  cdq83 = round(quantile(es_abs, prob = .8335, na.rm = TRUE), ndec),
                   count = n())
     } else {
-      return("Please enter a valid method")
+      return(warning("Please enter a valid method"))
     }
-    es_values <- as.matrix(es_values)
+    es_values <- as.data.frame(es_values)
     es_table <- matrix(nrow = 1, ncol = 4)
-    rownames(es_table) <- "Raw effect size"
+    rownames(es_values) <- "Raw effect size"
 
 
     for (i in 1:3) {
@@ -61,54 +61,53 @@ esd_table <- function(df,
         # mutate({{ grouping_var }} := as.character({{ grouping_var }})) %>%
         # bind_rows(mutate(., {{grouping_var}} := "All")) %>%
         group_by({{ grouping_var }}) %>%
-        summarise(cdq25 = quantile({{ es }}, prob = .25, na.rm = TRUE),
-                  cdq50 = quantile({{ es }}, prob = .50, na.rm = TRUE),
-                  cdq75 = quantile({{ es }}, prob = .75, na.rm = TRUE),
+        summarise(cdq25 = round(quantile(es_abs, prob = .25, na.rm = TRUE), ndec),
+                  cdq50 = round(quantile(es_abs, prob = .50, na.rm = TRUE), ndec),
+                  cdq75 = round(quantile(es_abs, prob = .75, na.rm = TRUE), ndec),
                   count = n()) %>%
         ungroup() %>%
         bind_rows(df %>% summarise({{grouping_var}} := "All",
-                                   cdq25 = quantile({{ es }}, prob = .25, na.rm = TRUE),
-                                   cdq50 = quantile({{ es }}, prob = .50, na.rm = TRUE),
-                                   cdq75 = quantile({{ es }}, prob = .75, na.rm = TRUE),
+                                   cdq25 = round(quantile(es_abs, prob = .25, na.rm = TRUE), ndec),
+                                   cdq50 = round(quantile(es_abs, prob = .50, na.rm = TRUE), ndec),
+                                   cdq75 = round(quantile(es_abs, prob = .75, na.rm = TRUE), ndec),
                                    count = n()))
     } else if (method == "thirds") {
       es_values <- df %>%
         # mutate({{grouping_var}} := as.character({{grouping_var}})) %>%
         # bind_rows(mutate(., {{grouping_var}} := "All")) %>%
         group_by({{ grouping_var }}) %>%
-        summarise(cdq16 = quantile({{ es }}, prob = .1665, na.rm = TRUE),
-                  cdq50 = quantile({{ es }}, prob = .50, na.rm = TRUE),
-                  cdq83 = quantile({{ es }}, prob = .8335, na.rm = TRUE),
+        summarise(cdq16 = round(quantile(es_abs, prob = .1665, na.rm = TRUE), ndec),
+                  cdq50 = round(quantile(es_abs, prob = .50, na.rm = TRUE), ndec),
+                  cdq83 = round(quantile(es_abs, prob = .8335, na.rm = TRUE), ndec),
                   count = n()) %>%
         ungroup() %>%
         bind_rows(df %>% summarise({{grouping_var}} := "All",
-                                   cdq16 = quantile({{ es }}, prob = .1665, na.rm = TRUE),
-                                   cdq50 = quantile({{ es }}, prob = .50, na.rm = TRUE),
-                                   cdq83 = quantile({{ es }}, prob = .8335, na.rm = TRUE),
+                                   cdq16 = round(quantile(es_abs, prob = .1665, na.rm = TRUE), ndec),
+                                   cdq50 = round(quantile(es_abs, prob = .50, na.rm = TRUE), ndec),
+                                   cdq83 = round(quantile(es_abs, prob = .8335, na.rm = TRUE), ndec),
                                    count = n()))
     } else {
       return("Please enter a valid method")
     }
 
+
+
+
     es_values <- es_values %>%
       filter(count >= min_group_size)
-    es_values <- as.matrix(es_values)
-    es_table <- matrix(nrow = nrow(es_values), ncol = 4)
-    rownames(es_table) <- as.character(es_values[,1])
-    for (i in 1:nrow(es_values)) {
-      for (j in 1:3) {
-        es_table[i,j] <- format(round(as.numeric(es_values[i, j+1]), ndec), nsmall = ndec)
-      }
-      es_table[i,4] <- as.numeric(es_values[i,5])
-    }
+    es_values <- as.data.frame(es_values)
   }
   ifelse(method == "thirds",
-         colnames(es_table) <- c("16.65%", "50%", "83.35%", "Number of effects"),
-         colnames(es_table) <- c("25%", "50%", "75%", "Number of effects"))
+    ifelse(missing(grouping_var),
+         colnames(es_values) <- c("16.65%", "50%", "83.35%", "Number of effects"),
+         colnames(es_values) <- c("Group", "16.65%", "50%", "83.35%", "Number of effects")),
+    ifelse(missing(grouping_var),
+           colnames(es_values) <- c("25%", "50%", "75%", "Number of effects"),
+           colnames(es_values) <- c("Group", "25%", "50%", "75%", "Number of effects")))
 
 
   if (csv_write == TRUE) {
     write.csv(es_table, file = path_file_name)
   }
-  return(es_table)
+  return(es_values)
 }
