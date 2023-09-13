@@ -16,12 +16,12 @@ esd_plot(
 )
 }
 \arguments{
-\item{df}{Dataset}
+\item{df}{Dataset.}
 
-\item{es}{Column name of effect sizes}
+\item{es}{Column name of effect sizes.}
 
 \item{es_type}{A string describing the type of effect size used (e.g.,
-"Cohen's d")}
+"Cohen's d").}
 
 \item{method}{Defaults to FALSE, can also be 'thirds' for 16.65th, 50th, and
 83.35th percentiles, or 'quads' for 25th, 50th, and 75th percentiles.}
@@ -36,13 +36,13 @@ interest. This will split the histogram into two parts around the inputted
 value.}
 
 \item{abs}{Defaults to FALSE. If set to TRUE, plots all effect sizes as
-absolute values}
+absolute values.}
 
 \item{bin_width}{Numeric argument that corresponds to the bin width for the
-histogram. Defaults to 0.1}
+histogram. Defaults to 0.1.}
 }
 \value{
-A ggplot object
+A ggplot object.
 }
 \description{
 Creating a plot for an effect size distribution

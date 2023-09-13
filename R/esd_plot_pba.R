@@ -2,7 +2,7 @@
 #'
 #' @param lim_obj An object of class "limitmeta".
 #' @param es_type A string describing the type of effect size used (e.g.,
-#'   "Cohen's d")
+#'   "Cohen's d").
 #' @param sesoi A numeric argument that corresponds to the population ES of
 #'   interest. This will split the histogram into two parts around the inputted
 #'   value.
@@ -12,7 +12,7 @@
 #' @param method Defaults to FALSE, can also be 'thirds' for 16.65th, 50th, and
 #'   83.35th percentiles, or 'quads' for 25th, 50th, and 75th percentiles.
 #' @param abs Defaults to FALSE. If set to TRUE, plots all effect sizes as
-#'    absolute values
+#'    absolute values.
 #' @param sum_es_type Defaults to "diamond". Sets the type of summary effect
 #'    size visualisation. "diamond" will create a diamond shape centred around
 #'    the summary effect size, with the width of the diamond showing the 95% CI.
@@ -22,10 +22,14 @@
 #'   histogram. Defaults to 0.1
 
 #'
-#' @return A ggplot object
+#' @return A ggplot object.
 #' @export
 #'
-#' @examples esd_plot_pba(lim_obj = l1, es_type = "Cohen's d", sum_es = TRUE)
+#' @examples
+#' m1 <- meta::metagen(TE = ot_dat$yi, seTE = ot_dat$sei)
+#' l1 <- metasens::limitmeta(m1)
+#' esd_plot_pba(lim_obj = l1, es_type = "Cohen's d", sum_es = TRUE)
+#'
 esd_plot_pba <- function(lim_obj,
                          es_type,
                          sesoi = NULL,

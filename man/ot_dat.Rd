@@ -5,7 +5,7 @@
 Data from Oxytocin adminsitration studies
 }
 \description{
-%%  ~~ A concise (1-5 lines) description of the dataset. ~~
+Effect sizes converted to Hedges' g, filtered.
 }
 \usage{data("ot_dat")}
 \format{
@@ -32,9 +32,10 @@ Data from Oxytocin adminsitration studies
     \item{\code{n_total}}{a numeric vector}
     \item{\code{es_type}}{a character vector}
     \item{\code{raw_es}}{a numeric vector}
+    \item{\code{raw_se}}{a numeric vector}
     \item{\code{ID}}{a numeric vector}
     \item{\code{df}}{a numeric vector}
-    \item{\code{yi_abs}}{a numeric vector}
+    \item{\code{h_factor}}{a numeric vector}
   }
 }
 \details{

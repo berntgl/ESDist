@@ -1,9 +1,9 @@
 #' Creating a plot for an effect size distribution
 #'
-#' @param df Dataset
-#' @param es Column name of effect sizes
+#' @param df Dataset.
+#' @param es Column name of effect sizes.
 #' @param es_type A string describing the type of effect size used (e.g.,
-#'   "Cohen's d")
+#'   "Cohen's d").
 #' @param method Defaults to FALSE, can also be 'thirds' for 16.65th, 50th, and
 #'   83.35th percentiles, or 'quads' for 25th, 50th, and 75th percentiles.
 #' @param mean Defaults to NULL, but will insert a ggplot geom_vline element
@@ -14,11 +14,11 @@
 #'   interest. This will split the histogram into two parts around the inputted
 #'   value.
 #' @param abs Defaults to FALSE. If set to TRUE, plots all effect sizes as
-#'    absolute values
+#'    absolute values.
 #' @param bin_width Numeric argument that corresponds to the bin width for the
-#'   histogram. Defaults to 0.1
+#'   histogram. Defaults to 0.1.
 #'
-#' @return A ggplot object
+#' @return A ggplot object.
 #' @export
 #'
 #' @examples esd_plot(df = ot_dat,

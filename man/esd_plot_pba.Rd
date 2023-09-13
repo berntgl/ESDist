@@ -19,7 +19,7 @@ esd_plot_pba(
 \item{lim_obj}{An object of class "limitmeta".}
 
 \item{es_type}{A string describing the type of effect size used (e.g.,
-"Cohen's d")}
+"Cohen's d").}
 
 \item{sesoi}{A numeric argument that corresponds to the population ES of
 interest. This will split the histogram into two parts around the inputted
@@ -33,7 +33,7 @@ the distribution of adjusted effect sizes.}
 83.35th percentiles, or 'quads' for 25th, 50th, and 75th percentiles.}
 
 \item{abs}{Defaults to FALSE. If set to TRUE, plots all effect sizes as
-absolute values}
+absolute values.}
 
 \item{sum_es_type}{Defaults to "diamond". Sets the type of summary effect
 size visualisation. "diamond" will create a diamond shape centred around
@@ -45,11 +45,14 @@ size, with lines and brackets showing the width of the 95\% CI.}
 histogram. Defaults to 0.1}
 }
 \value{
-A ggplot object
+A ggplot object.
 }
 \description{
 Creating an iceberg plot to visualise publication bias adjustment.
 }
 \examples{
+m1 <- meta::metagen(TE = ot_dat$yi, seTE = ot_dat$sei)
+l1 <- metasens::limitmeta(m1)
 esd_plot_pba(lim_obj = l1, es_type = "Cohen's d", sum_es = TRUE)
+
 }

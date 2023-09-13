@@ -31,8 +31,7 @@ meta-analyses.
 
 You can install the `ESDist` package from [GitHub](https://github.com/) with:
 
-``` r
-# install.packages("devtools")
+```{r, message=FALSE, warning=FALSE}
 library(devtools)
 devtools::install_github("berntgl/ESDist")
 ```
@@ -47,7 +46,7 @@ include some grouping variable or other study information. For the publication
 bias-adjusted functions, users need a column with the standard error for each
 study effect size. Alternatively, users can include a column with the lower 
 bound of the 95% confidence interval, and one for the upper bound. The `ot_dat` 
-dataset included in the `ESDist` package contains several columns in adition to 
+dataset included in the `ESDist` package contains several columns in addition to 
 the effect size column (`yi`).
 
 ```{r}
@@ -226,8 +225,7 @@ to calculate benchmarks based on effect sizes that are adjusted for publication
 bias. 
 
 ```{r}
-table4 <- esd_table_pba(lim_obj = l1,
-                    es_type = "Hedges' g")
+table4 <- esd_table_pba(lim_obj = l1)
 
 table4
 ```
@@ -245,7 +243,6 @@ to `TRUE`.
 
 ```{r}
 table5 <- esd_table_pba(lim_obj = l2,
-                    es_type = "Hedges' g",
                     grouping = TRUE)
 
 table5

@@ -1,21 +1,21 @@
 #' Creating an ESD plot per group
 #'
-#' @param df Dataset
-#' @param es Column name of effect sizes
+#' @param df Dataset.
+#' @param es Column name of effect sizes.
 #' @param es_type A string describing the type of effect size used (e.g.,
-#'   "Cohen's d")
-#' @param grouping_var Column name of grouping variable
-#' @param method Defaults to FALSE, but can be 'quads' or 'thirds'
+#'   "Cohen's d").
+#' @param grouping_var Column name of grouping variable.
+#' @param method Defaults to FALSE, but can be 'quads' or 'thirds'.
 #' @param mean Defaults to FALSE, but will insert a ggplot geom_vline element
-#'   that corresponds to the mean effect size
+#'   that corresponds to the mean effect size.
 #' @param abs Defaults to FALSE. If set to TRUE, plots all effect sizes as
-#'    absolute values
+#'    absolute values.
 #' @param min_group_size Numeric value corresponding to the minimum amount of
 #' effect sizes for a group to be included in the plot. Defaults to 20.
 #' @param bin_width Numeric argument that corresponds to the bin width for the
-#'   histogram. Defaults to 0.1
+#'   histogram. Defaults to 0.1.
 #'
-#' @return A ggplot element
+#' @return A ggplot element.
 #' @export
 #'
 #' @examples esd_plot_group(df = ot_dat,
@@ -150,7 +150,7 @@ esd_plot_group <- function(df,
         geom_vline(aes(xintercept = mean), color = accent,
                    linetype = "dotted", size = 1)
     } else if (is.numeric(mean)) {
-      plot <- plot +ß
+      plot <- plot +
         geom_vline(aes(xintercept = mean), color = accent,
                    linetype = "dotted", size = 1)
     } else {

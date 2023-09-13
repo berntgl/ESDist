@@ -5,7 +5,7 @@
 Unfiltered data from oxytocin administration studies
 }
 \description{
-%%  ~~ A concise (1-5 lines) description of the dataset. ~~
+Data from meta-analyses on oxytocin administration studies.
 }
 \usage{data("ot_dat_raw")}
 \format{

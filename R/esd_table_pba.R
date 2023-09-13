@@ -1,3 +1,30 @@
+#' Creating a table for field-specific effect size benchmarks, adjusted for
+#' publication bias
+#'
+#' @param lim_obj An object of class "limitmeta".
+#' @param grouping Defaults to FALSE. When set to TRUE, will detect subgrouping
+#' of the lim_obj and calculate benchmarks for each group.
+#' @param method Defaults to 'quads', can also be 'thirds'.
+#' @param min_group_size Sets the minimum amount of effect sizes needed to
+#' include a group in the table. Defaults to 3.
+#' @param csv_write Defaults to FALSE. Will write the outputted table as a csv.
+#' @param path_file_name A string containing the directory to which the .csv
+#' file will be saved, including the title of the .csv file (has to end in
+#' '.csv').
+#' @param ndec The number of decimal places in which all values should be
+#' reported. Defaults to 2.
+#'
+#' @return A table.
+#' @export
+#'
+#' @examples
+#' m2 <- meta::metagen(TE = ot_dat$yi,
+#'                     seTE = ot_dat$sei,
+#'                     subgroup = ot_dat$group)
+#' l2 <- metasens::limitmeta(m2)
+#' esd_table_pba(lim_obj = l2, grouping = TRUE)
+#'
+#'
 esd_table_pba <- function(lim_obj,
                           grouping = FALSE,
                           method = "quads",
