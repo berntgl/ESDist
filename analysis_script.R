@@ -1,8 +1,3 @@
-# Loading libraries ---------------------------------
-install.packages("dplyr", "ggplot2")
-library(dplyr)
-library(ggplot2)
-
 # Loading package ---------------------------------
 
 library(devtools)

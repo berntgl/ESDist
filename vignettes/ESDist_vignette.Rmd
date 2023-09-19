@@ -69,8 +69,6 @@ obtained from meta-analyses.
 
 ```{r, message=FALSE, warning=FALSE}
 library(ESDist)
-library(dplyr)
-library(ggplot2)
 ```
 
 ```{r, fig.height = 7}

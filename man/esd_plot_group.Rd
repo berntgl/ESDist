@@ -17,31 +17,31 @@ esd_plot_group(
 )
 }
 \arguments{
-\item{df}{Dataset.}
+\item{df}{Dataset}
 
-\item{es}{Column name of effect sizes.}
+\item{es}{Column name of effect sizes}
 
 \item{es_type}{A string describing the type of effect size used (e.g.,
-"Cohen's d").}
+"Cohen's d")}
 
-\item{grouping_var}{Column name of grouping variable.}
+\item{grouping_var}{Column name of grouping variable}
 
-\item{method}{Defaults to FALSE, but can be 'quads' or 'thirds'.}
+\item{method}{Defaults to FALSE, but can be 'quads' or 'thirds'}
 
 \item{mean}{Defaults to FALSE, but will insert a ggplot geom_vline element
-that corresponds to the mean effect size.}
+that corresponds to the mean effect size}
 
 \item{abs}{Defaults to FALSE. If set to TRUE, plots all effect sizes as
-absolute values.}
+absolute values}
 
 \item{min_group_size}{Numeric value corresponding to the minimum amount of
 effect sizes for a group to be included in the plot. Defaults to 20.}
 
 \item{bin_width}{Numeric argument that corresponds to the bin width for the
-histogram. Defaults to 0.1.}
+histogram. Defaults to 0.1}
 }
 \value{
-A ggplot element.
+A ggplot element
 }
 \description{
 Creating an ESD plot per group
