@@ -48,7 +48,7 @@ plot2
 # our study design, we can detect 55.17% of empirical effect sizes.
 
 plot3 <- esd_plot(df = ot_dat, #we will now use absolute ES values only
-                  es = yi_abs,
+                  es = yi,
                   es_type = "Hedges' g",
                   sesoi = 0.3)
 
@@ -76,7 +76,7 @@ plot4
 # approcah (note that it is also possible to use the thirds approach). We store
 # the figure in a variable called plot5.
 
-plot5 <- esd_plot_group(df = ot_dat2,
+plot5 <- esd_plot_group(df = ot_dat,
                         es = yi,
                         es_type = "Hedges' g",
                         grouping_var = group,
@@ -129,7 +129,9 @@ plot7
 # all absolute effect sizes.
 
 table1 <- esd_table(df = ot_dat,
-                     es = yi)
+                    es = yi,
+                    path_file_name = '../../Documents/Thesis/tables/table1.csv',
+                    )
 
 table1
 
@@ -141,8 +143,10 @@ table1
 # called table2a.
 
 table2 <- esd_table(df = ot_dat,
-                     es = yi,
-                     grouping_var = group)
+                     es = yi)
+                     # grouping_var = group,
+                     #csv_write = TRUE,
+                     #path_file_name = "../../Documents/Thesis/tables/table2.csv")
 
 table2
 
@@ -157,7 +161,7 @@ esd_table(df = ot_dat,
           es = yi,
           grouping_var = group,
           csv_write = TRUE,
-          file_name = "table3.csv")
+          path_file_name = "../../Documents/Thesis/tables/table2.csv")
 
 # esd_table_pba() =================================
 
@@ -182,7 +186,9 @@ l2 <- limitmeta(m2)
 # argument to TRUE.
 
 table4 <- esd_table_pba(lim_obj = l2,
-                        grouping = TRUE)
+                        grouping = TRUE,
+                        csv_write = TRUE,
+                        path_file_name = "../../Documents/Thesis/tables/table4.csv")
 
 table4
 

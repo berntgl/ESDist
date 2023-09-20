@@ -46,14 +46,8 @@ esd_table <- function(df,
       return(warning("Please enter a valid method"))
     }
     es_values <- as.data.frame(es_values)
-    es_table <- matrix(nrow = 1, ncol = 4)
     rownames(es_values) <- "Raw effect size"
 
-
-    for (i in 1:3) {
-      es_table[i] <- format(round(as.numeric(es_values[i]), ndec), nsmall = ndec)
-    }
-    es_table[1,4] <- as.numeric(es_values[1,4])
 
   } else {
     if (method == "quads") {
@@ -107,7 +101,7 @@ esd_table <- function(df,
 
 
   if (csv_write == TRUE) {
-    write.csv(es_table, file = path_file_name)
+    write.csv(es_values, file = path_file_name)
   }
   return(es_values)
 }
