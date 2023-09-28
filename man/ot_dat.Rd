@@ -9,7 +9,7 @@ Effect sizes converted to Hedges' g, filtered.
 }
 \usage{data("ot_dat")}
 \format{
-  A data frame with 182 observations on the following 24 variables.
+  A data frame with 182 observations on the following 25 variables.
   \describe{
     \item{\code{meta_analysis}}{a character vector}
     \item{\code{meta_analysis_doi}}{a character vector}
@@ -32,8 +32,8 @@ Effect sizes converted to Hedges' g, filtered.
     \item{\code{n_total}}{a numeric vector}
     \item{\code{es_type}}{a character vector}
     \item{\code{raw_es}}{a numeric vector}
-    \item{\code{raw_se}}{a numeric vector}
     \item{\code{ID}}{a numeric vector}
+    \item{\code{raw_se}}{a numeric vector}
     \item{\code{df}}{a numeric vector}
     \item{\code{h_factor}}{a numeric vector}
   }

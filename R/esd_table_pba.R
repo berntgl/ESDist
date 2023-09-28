@@ -168,11 +168,12 @@ esd_table_pba <- function(lim_obj,
   }
   ifelse(method == "thirds",
          ifelse(isFALSE(grouping),
-                colnames(adj_values) <- c("16.65%", "50%", "83.35%", "Number of effects"),
-                colnames(adj_values) <- c("16.65%", "50%", "83.35%adj", "Number of effects")),
+                colnames(es_values) <- c("16.65%", "50%", "83.35%", "Number of effects"),
+                colnames(es_values) <- c("Group", "16.65%", "50%", "83.35%", "Number of effects")),
          ifelse(isFALSE(grouping),
-                colnames(adj_values) <- c("25%", "50%", "75%", "Number of effects"),
-                colnames(adj_values) <- c("25%", "50%", "75%", "Number of effects")))
+                colnames(es_values) <- c("25%", "50%", "75%", "Number of effects"),
+                colnames(es_values) <- c("Group", "25%", "50%", "75%", "Number of effects")))
+
 
 
 

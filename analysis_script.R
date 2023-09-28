@@ -97,6 +97,8 @@ plot5
 # automatically generates a visualisation for the summary effect size and the
 # corresponding 95% CI.
 
+ot_dat <- subset(ot_dat, sei != 0)
+
 install.packages("meta", "metasens")
 library(meta)
 library(metasens)
@@ -143,10 +145,10 @@ table1
 # called table2a.
 
 table2 <- esd_table(df = ot_dat,
-                     es = yi)
-                     # grouping_var = group,
-                     #csv_write = TRUE,
-                     #path_file_name = "../../Documents/Thesis/tables/table2.csv")
+                     es = yi,
+                     grouping_var = group,
+                     csv_write = TRUE,
+                     path_file_name = "../../Documents/Thesis/tables/table2.csv")
 
 table2
 

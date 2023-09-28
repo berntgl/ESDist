@@ -63,7 +63,6 @@ esd_plot_pba <- function(lim_obj,
                    lim_obj[16]) # upper.adjust
   df$TE_abs <- abs(df$TE)
   df$TE.limit_abs <- abs(df$TE.limit)
-
   if (!isFALSE(method)) {
     abs = TRUE
     sum_es = FALSE
@@ -97,10 +96,10 @@ esd_plot_pba <- function(lim_obj,
           axis.title = element_text(size=20))+
         scale_y_continuous(labels = function(x) abs(x))
     } else {
-      rank_random <- length(df$TE[df$TE < sesoi])/length(df$TE) * 100
+      rank_random <- length(df$TE_abs[df$TE_abs < sesoi])/length(df$TE_abs) * 100
       rank_rev_random <- 100 - rank_random
 
-      rank_adjust <- length(df$TE.limit[df$TE.limit < sesoi])/length(df$TE.limit) * 100
+      rank_adjust <- length(df$TE.limit_abs[df$TE.limit_abs < sesoi])/length(df$TE.limit_abs) * 100
       rank_rev_adjust <- 100 - rank_adjust
 
       rank_perc_random <- sprintf("%.2f%%", rank_random)
