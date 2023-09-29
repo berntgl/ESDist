@@ -148,7 +148,7 @@ esd_table_pba <- function(lim_obj,
     es_values <- es_values %>%
       filter(count >= min_group_size)
     es_values <- as.data.frame(es_values)
-    adj_values <- data.frame(nrow = 2 * nrow(es_values), ncol = 4)
+    adj_values <- data.frame(matrix(nrow = (2 * nrow(es_values)), ncol = 4))
     adj_table_rownames <- c()
 
     for (h in 1:nrow(es_values)) {
@@ -167,15 +167,8 @@ esd_table_pba <- function(lim_obj,
 
   }
   ifelse(method == "thirds",
-         ifelse(isFALSE(grouping),
-                colnames(es_values) <- c("16.65%", "50%", "83.35%", "Number of effects"),
-                colnames(es_values) <- c("Group", "16.65%", "50%", "83.35%", "Number of effects")),
-         ifelse(isFALSE(grouping),
-                colnames(es_values) <- c("25%", "50%", "75%", "Number of effects"),
-                colnames(es_values) <- c("Group", "25%", "50%", "75%", "Number of effects")))
-
-
-
+         colnames(adj_values) <- c("16.65%", "50%", "83.35%", "Number of effects"),
+         colnames(adj_values) <- c("25%", "50%", "75%", "Number of effects"))
 
 
   if (csv_write == TRUE) {
