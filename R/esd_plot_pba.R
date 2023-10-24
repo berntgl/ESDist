@@ -74,8 +74,8 @@ esd_plot_pba <- function(lim_obj,
 
   if (isFALSE(abs)) {
     plot <- ggplot(data = df) +
-      geom_histogram(aes(x = TE), fill=primary_light, binwidth = bin_width, center = (bin_width / 2)) +
-      geom_histogram(aes(x = TE.limit, y = -after_stat(count)), fill = primary_dark, binwidth = bin_width, center = (bin_width / 2)) +
+      geom_histogram(aes(x = TE), fill=primary_light, binwidth = bin_width) +
+      geom_histogram(aes(x = TE.limit, y = -after_stat(count)), fill = primary_dark, binwidth = bin_width) +
       theme_minimal() +
       geom_hline(aes(yintercept = 0), size = 0.2)+
       labs(x = es_type, y = "Frequency")+

@@ -119,10 +119,10 @@ plot7
 
 # Finally, we can visualise the range of detectable ESs based on a sesoi.
 
-plot7 <- esd_plot_pba(lim_obj = l1,
+plot8 <- esd_plot_pba(lim_obj = l1,
                       es_type = "Hedges' g",
                       sesoi = 0.3)
-plot7
+plot8
 
 # esd_table() =================================
 

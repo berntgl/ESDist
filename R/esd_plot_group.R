@@ -84,7 +84,7 @@ esd_plot_group <- function(df,
             panel.spacing = unit(2, "lines"))
   } else if (!isFALSE(abs)) {
     plot <- ggplot(data = dat_b)+
-      geom_histogram(aes(es_abs), fill = primary_dark, binwidth = bin_width)+
+      geom_histogram(aes(es_abs), fill = primary_dark, binwidth = bin_width, center = (bin_width / 2))+
       labs(x = es_type, y = "Frequency")+
       theme_minimal() +
       facet_grid(vars({{grouping_var}}),

@@ -64,7 +64,7 @@ esd_plot <- function(df,
   } else if (!isFALSE(abs)) {
     if (missing(sesoi)){
       plot <- ggplot(data = df) +
-        geom_histogram(aes(es_col_abs), fill = primary_dark, binwidth = bin_width) +
+        geom_histogram(aes(es_col_abs), fill = primary_dark, binwidth = bin_width, center = (bin_width / 2)) +
         #scale_x_continuous(breaks = seq(0, 3, 0.5)) +
         labs(x = es_type, y = "Frequency")+
         theme_minimal() +
@@ -79,7 +79,8 @@ esd_plot <- function(df,
 
       plot <- ggplot(data = df) +
         geom_histogram(aes(es_col_abs, fill = after_stat(x) > sesoi),
-                       binwidth = bin_width) +
+                       binwidth = bin_width,
+                       center = (bin_width / 2)) +
         scale_fill_manual(name = sprintf("ES < or > %.2f", sesoi),
                           labels = c(rank_perc, rank_rev_perc),
                           values = c(secondary_light, primary_dark)) +
