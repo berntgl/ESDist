@@ -22,9 +22,15 @@ with:
 ``` r
 library(devtools)
 devtools::install_github("berntgl/ESDist")
+#> utf8    (1.2.3 -> 1.2.4) [CRAN]
+#> vctrs   (0.6.3 -> 0.6.4) [CRAN]
+#> fansi   (1.0.4 -> 1.0.5) [CRAN]
+#> ggplot2 (3.4.3 -> 3.4.4) [CRAN]
 #> 
+#> The downloaded binary packages are in
+#>  /var/folders/j7/lmhpj_jj73qfc31klr2wh3vw0000gp/T//Rtmp0NjmSX/downloaded_packages
 #> ── R CMD build ─────────────────────────────────────────────────────────────────
-#> * checking for file ‘/private/var/folders/j7/lmhpj_jj73qfc31klr2wh3vw0000gp/T/Rtmp5Wg8I2/remotesddaf64c4f769/berntgl-ESDist-41a45d7/DESCRIPTION’ ... OK
+#> * checking for file ‘/private/var/folders/j7/lmhpj_jj73qfc31klr2wh3vw0000gp/T/Rtmp0NjmSX/remotesca616aeeb2f/berntgl-ESDist-b4c73d8/DESCRIPTION’ ... OK
 #> * preparing ‘ESDist’:
 #> * checking DESCRIPTION meta-information ... OK
 #> * checking for LF line-endings in source and make files and shell scripts
@@ -53,29 +59,29 @@ head(ESDist::ot_dat)
 #> 2 bakermans_kranenburg 10.1038/tp.2013.34               2018  averbeck_2012
 #> 3 bakermans_kranenburg 10.1038/tp.2013.34               2018  den-boer_1992
 #> 4 bakermans_kranenburg 10.1038/tp.2013.34               2018 epperson_1996a
-#> 5 bakermans_kranenburg 10.1038/tp.2013.34               2018 epperson_1996b
 #> 6 bakermans_kranenburg 10.1038/tp.2013.34               2018    feifel_2010
+#> 7 bakermans_kranenburg 10.1038/tp.2013.34               2018   goldman_2011
 #>                        study_doi study_year     yi lower upper   sei group
 #> 1        10.1073/pnas.0910249107       2010  0.534    NA    NA 0.281   ASD
 #> 2      10.1017/S0033291711001413       2012  0.192    NA    NA 0.192   SCZ
 #> 3   10.1016/0196-9781(92)90010-Z       1992 -0.877    NA    NA 0.563   OCD
 #> 4   10.1016/0006-3223(96)00120-5       1996  0.461    NA    NA 0.226   OCD
-#> 5   10.1016/0006-3223(96)00165-5       1996  0.000    NA    NA 0.000   OCD
 #> 6 10.1016/j.biopsych.2010.04.039       2010  0.520    NA    NA 0.265   SCZ
+#> 7      10.1007/s00213-011-2193-8       2011  0.000    NA    NA 0.262   SCZ
 #>   group_secondary favours_oxytocin    doses  meta_analysis_pop_ind  design n1
 #> 1                         positive   single bakermans_kranenburg_1  Within NA
 #> 2                         positive   single bakermans_kranenburg_1  Within NA
 #> 3                         positive multiple bakermans_kranenburg_1 Between  6
 #> 4                         positive multiple bakermans_kranenburg_1  Within NA
-#> 5                         positive multiple bakermans_kranenburg_1  Within NA
 #> 6                         positive multiple bakermans_kranenburg_1  Within NA
+#> 7                         positive   single bakermans_kranenburg_1  Within NA
 #>   n2 n_total   es_type raw_es ID raw_se df  h_factor
 #> 1 NA      13 Cohen's d   0.57  1   0.30 12 0.9361702
 #> 2 NA      21 Cohen's d   0.20  2   0.20 20 0.9620253
 #> 3  6      NA Cohen's d  -0.95  4   0.61 10 0.9230769
 #> 4 NA       7 Cohen's d   0.53  5   0.26  6 0.8695652
-#> 5 NA       2 Cohen's d   0.00  6   0.71  1 0.0000000
 #> 6 NA      15 Cohen's d   0.55  7   0.28 14 0.9454545
+#> 7 NA      13 Cohen's d   0.00  8   0.28 12 0.9361702
 ```
 
 ## esd_plot()
@@ -87,8 +93,6 @@ estimates obtained from meta-analyses.
 
 ``` r
 library(ESDist)
-library(dplyr)
-library(ggplot2)
 ```
 
 ``` r
@@ -248,7 +252,7 @@ table1 <- esd_table(df = ot_dat,
 
 table1
 #>                  25%  50% 75% Number of effects
-#> Raw effect size 0.06 0.23 0.5               183
+#> Raw effect size 0.06 0.24 0.5               182
 ```
 
 ### Calculate effect size benchmarks per group
@@ -264,17 +268,16 @@ table3 <- esd_table(df = ot_dat,
                     grouping_var = group)
 
 table3
-#>           Group  25%  50%  75% Number of effects
-#> 1            AN 0.02 0.05 0.06                 6
-#> 2           ASD 0.11 0.31 0.55                32
-#> 3           BPD 0.16 1.22 2.29                 5
-#> 4           OCD 0.23 0.46 0.67                 3
-#> 5          PTSD 0.20 0.32 0.38                 6
-#> 6           SCZ 0.05 0.13 0.24                20
-#> 7       anxiety 0.19 0.31 0.41                 4
-#> 8    depression 0.21 0.45 0.91                 6
-#> 9  neurotypical 0.05 0.25 0.66                89
-#> 10          All 0.06 0.23 0.50               183
+#>          Group  25%  50%  75% Number of effects
+#> 1           AN 0.02 0.05 0.06                 6
+#> 2          ASD 0.11 0.31 0.55                32
+#> 3          BPD 0.16 1.22 2.29                 5
+#> 4         PTSD 0.20 0.32 0.38                 6
+#> 5          SCZ 0.05 0.13 0.24                20
+#> 6      anxiety 0.19 0.31 0.41                 4
+#> 7   depression 0.21 0.45 0.91                 6
+#> 8 neurotypical 0.05 0.25 0.66                89
+#> 9          All 0.06 0.24 0.50               182
 ```
 
 ## esd_table_pba()
@@ -288,8 +291,8 @@ table4 <- esd_table_pba(lim_obj = l1)
 
 table4
 #>                       25%  50%  75% Number of effects
-#> Raw effect size      0.06 0.23 0.50               183
-#> Adjusted effect size 0.06 0.20 0.41               183
+#> Raw effect size      0.06 0.24 0.50               182
+#> Adjusted effect size 0.08 0.20 0.39               182
 ```
 
 In case the user wants effect size benchmarks per group, the user should
@@ -310,25 +313,23 @@ table5 <- esd_table_pba(lim_obj = l2,
 table5
 #>                        25%  50%  75% Number of effects
 #> AN                    0.02 0.05 0.06                 6
-#> AN adjusted           0.02 0.04 0.07                 6
+#> AN adjusted           0.04 0.07 0.09                 6
 #> ASD                   0.11 0.31 0.55                32
-#> ASD adjusted          0.11 0.26 0.42                32
+#> ASD adjusted          0.10 0.23 0.39                32
 #> BPD                   0.16 1.22 2.29                 5
-#> BPD adjusted          0.17 0.97 1.74                 5
-#> OCD                   0.23 0.46 0.67                 3
-#> OCD adjusted          0.32 0.40 0.54                 3
+#> BPD adjusted          0.19 0.92 1.82                 5
 #> PTSD                  0.20 0.32 0.38                 6
-#> PTSD adjusted         0.10 0.26 0.32                 6
+#> PTSD adjusted         0.12 0.22 0.29                 6
 #> SCZ                   0.05 0.13 0.24                20
-#> SCZ adjusted          0.09 0.13 0.19                20
+#> SCZ adjusted          0.08 0.15 0.18                20
 #> anxiety               0.19 0.31 0.41                 4
-#> anxiety adjusted      0.11 0.25 0.37                 4
+#> anxiety adjusted      0.06 0.21 0.36                 4
 #> depression            0.21 0.45 0.91                 6
-#> depression adjusted   0.16 0.39 0.75                 6
+#> depression adjusted   0.14 0.37 0.72                 6
 #> neurotypical          0.05 0.25 0.66                89
-#> neurotypical adjusted 0.05 0.20 0.58                89
-#> All                   0.06 0.23 0.50               183
-#> All adjusted          0.06 0.20 0.41               183
+#> neurotypical adjusted 0.06 0.20 0.55                89
+#> All                   0.06 0.24 0.50               182
+#> All adjusted          0.08 0.20 0.39               182
 ```
 
 ### Editing and saving tables
@@ -358,5 +359,5 @@ library(ggplot2)
 esd_perc(df = ot_dat,
          es = yi,
          value = 0.3)
-#> [1] 57.37705
+#> [1] 57.14286
 ```
