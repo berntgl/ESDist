@@ -51,7 +51,7 @@ Creating a table for field-specific effect size benchmarks, adjusted for
 publication bias
 }
 \examples{
-esd_table_pba(df = ot_dat, es = yi, se = sei, grouping = TRUE)
+esd_table_pba(df = ot_dat, es = yi, se = sei, grouping_var = group)
 
 
 }
