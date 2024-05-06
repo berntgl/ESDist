@@ -5,7 +5,10 @@
 \title{Creating an iceberg plot to visualise publication bias adjustment.}
 \usage{
 esd_plot_pba(
-  lim_obj,
+  df = NULL,
+  es = NULL,
+  se = NULL,
+  lim_obj = NULL,
   es_type,
   sesoi = NULL,
   sum_es = TRUE,
@@ -16,6 +19,12 @@ esd_plot_pba(
 )
 }
 \arguments{
+\item{df}{Dataset.}
+
+\item{es}{Column name of effect sizes.}
+
+\item{se}{Column name of standard error.}
+
 \item{lim_obj}{An object of class "limitmeta".}
 
 \item{es_type}{A string describing the type of effect size used (e.g.,
@@ -51,8 +60,6 @@ A ggplot object.
 Creating an iceberg plot to visualise publication bias adjustment.
 }
 \examples{
-m1 <- meta::metagen(TE = ot_dat$yi, seTE = ot_dat$sei)
-l1 <- metasens::limitmeta(m1)
-esd_plot_pba(lim_obj = l1, es_type = "Cohen's d", sum_es = TRUE)
+esd_plot_pba(df = ot_dat, es = yi, se = sei, es_type = "Cohen's d")
 
 }

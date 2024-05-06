@@ -1,5 +1,8 @@
 #' Creating an iceberg plot to visualise publication bias adjustment.
 #'
+#' @param df Dataset.
+#' @param es Column name of effect sizes.
+#' @param se Column name of standard error.
 #' @param lim_obj An object of class "limitmeta".
 #' @param es_type A string describing the type of effect size used (e.g.,
 #'   "Cohen's d").
@@ -20,17 +23,17 @@
 #'    size, with lines and brackets showing the width of the 95% CI.
 #' @param bin_width Numeric argument that corresponds to the bin width for the
 #'   histogram. Defaults to 0.1
-
 #'
 #' @return A ggplot object.
 #' @export
 #'
 #' @examples
-#' m1 <- meta::metagen(TE = ot_dat$yi, seTE = ot_dat$sei)
-#' l1 <- metasens::limitmeta(m1)
-#' esd_plot_pba(lim_obj = l1, es_type = "Cohen's d", sum_es = TRUE)
+#' esd_plot_pba(df = ot_dat, es = yi, se = sei, es_type = "Cohen's d")
 #'
-esd_plot_pba <- function(lim_obj,
+esd_plot_pba <- function(df = NULL,
+                         es = NULL,
+                         se = NULL,
+                         lim_obj = NULL,
                          es_type,
                          sesoi = NULL,
                          sum_es = TRUE,
@@ -50,7 +53,11 @@ esd_plot_pba <- function(lim_obj,
   benchmarks3 <- "#921B05"
   accent <- "#D5A42C"
 
-
+  if (!is.null(df)) {
+    df = as.data.frame(df)
+    meta_obj <- metagen(TE = df[, deparse(substitute(es))], seTE = df[, deparse(substitute(se))])
+    lim_obj <- limitmeta(meta_obj)
+  }
 
   stopifnot(class(lim_obj) == "limitmeta")
   df <- data.frame(lim_obj[1], # TE
@@ -160,42 +167,24 @@ esd_plot_pba <- function(lim_obj,
     }
   } else if (!isFALSE(method) & isFALSE(sum_es)) {
     if (method == "quads") {
-      TE_q1 <- quantile(df$TE_abs, prob = 0.25)
-      TEL_q1 <- quantile(df$TE.limit_abs, prob = 0.25)
-      q1_label <- "25th"
-      TE_q2 <- quantile(df$TE_abs, prob = 0.50)
-      TEL_q2 <- quantile(df$TE.limit_abs, prob = 0.5)
-      q2_label <- "50th"
-      TE_q3 <- quantile(df$TE_abs, prob = 0.75)
-      TEL_q3 <- quantile(df$TE.limit_abs, prob = 0.75)
-      q3_label <- "75th"
-
+      annotation <- data.frame(
+        x1 = c(quantile(df$TE_abs, prob = 0.25), quantile(df$TE_abs, prob = 0.50), quantile(df$TE_abs, prob = 0.75)),
+        x2 = c(quantile(df$TE.limit_abs, prob = 0.25), quantile(df$TE.limit_abs, prob = 0.5), quantile(df$TE.limit_abs, prob = 0.75)),
+        label = c("25th", "50th", "75th")
+      )
       plot <- plot +
-        geom_segment(aes(x = TE_q1, xend = TE_q1, y = 0, yend = Inf, color = "q1"),
+        geom_segment(data=annotation,
+                     aes(x = x1, y=0, yend=Inf, color = label),
                      linetype = "dashed",
                      size = 1) +
-        geom_segment(aes(x = TEL_q1, xend = TEL_q1, y = 0, yend = -Inf, color = "q1"),
-                     linetype = "dashed",
-                     size = 1) +
-        geom_segment(aes(x = TE_q2, xend = TE_q2, y = 0, yend = Inf, color = "q2"),
-                     linetype = "dashed",
-                     size = 1) +
-        geom_segment(aes(x = TEL_q2, xend = TEL_q2, y = 0, yend = -Inf, color = "q2"),
-                     linetype = "dashed",
-                     size = 1) +
-        geom_segment(aes(x = TE_q3, xend = TE_q3, y = 0, yend = Inf, color = "q3"),
-                     linetype = "dashed",
-                     size = 1) +
-        geom_segment(aes(x = TEL_q3, xend = TEL_q3, y = 0, yend = -Inf, color = "q3"),
+        geom_segment(data=annotation,
+                     aes(x = x2, y=0, yend=-Inf, color = label),
                      linetype = "dashed",
                      size = 1) +
         scale_color_manual(name = "Percentiles",
-                           values = c(q1 = benchmarks1,
-                                      q2 = benchmarks2,
-                                      q3 = benchmarks3),
-                           labels = c(q1 = q1_label,
-                                      q2 = q2_label,
-                                      q3 = q3_label))+
+                           values = c("25th" = benchmarks1,
+                                      "50th" = benchmarks2,
+                                      "75th" = benchmarks3))+
         theme(legend.position = "bottom",
               panel.spacing = unit(2, "lines"),
               legend.title = element_text(size=14),
@@ -203,42 +192,25 @@ esd_plot_pba <- function(lim_obj,
               legend.key.size = unit(1, 'cm'))
 
     } else if (method == "thirds") {
-      TE_q1 <- quantile(df$TE_abs, prob = 0.1665)
-      TEL_q1 <- quantile(df$TE.limit_abs, prob = 0.1665)
-      q1_label <- "16.65th"
-      TE_q2 <- quantile(df$TE_abs, prob = 0.50)
-      TEL_q2 <- quantile(df$TE.limit_abs, prob = 0.5)
-      q2_label <- "50th"
-      TE_q3 <- quantile(df$TE_abs, prob = 0.8335)
-      TEL_q3 <- quantile(df$TE.limit_abs, prob = 0.8335)
-      q3_label <- "83.35th"
+      annotation <- data.frame(
+        x1 = c(quantile(df$TE_abs, prob = 0.1665), quantile(df$TE_abs, prob = 0.50), quantile(df$TE_abs, prob = 0.8335)),
+        x2 = c(quantile(df$TE.limit_abs, prob = 0.1665), quantile(df$TE.limit_abs, prob = 0.5), quantile(df$TE.limit_abs, prob = 0.8335)),
+        label = c("16.65th", "50th", "83.35th")
+      )
 
       plot <- plot +
-        geom_segment(aes(x = TE_q1, xend = TE_q1, y = 0, yend = Inf, color = "q1"),
+        geom_segment(data=annotation,
+                     aes(x = x1, y=0, yend=Inf, color = label),
                      linetype = "dashed",
                      size = 1) +
-        geom_segment(aes(x = TEL_q1, xend = TEL_q1, y = 0, yend = -Inf, color = "q1"),
-                     linetype = "dashed",
-                     size = 1) +
-        geom_segment(aes(x = TE_q2, xend = TE_q2, y = 0, yend = Inf, color = "q2"),
-                     linetype = "dashed",
-                     size = 1) +
-        geom_segment(aes(x = TEL_q2, xend = TEL_q2, y = 0, yend = -Inf, color = "q2"),
-                     linetype = "dashed",
-                     size = 1) +
-        geom_segment(aes(x = TE_q3, xend = TE_q3, y = 0, yend = Inf, color = "q3"),
-                     linetype = "dashed",
-                     size = 1) +
-        geom_segment(aes(x = TEL_q3, xend = TEL_q3, y = 0, yend = -Inf, color = "q3"),
+        geom_segment(data=annotation,
+                     aes(x = x2, y=0, yend=-Inf, color = label),
                      linetype = "dashed",
                      size = 1) +
         scale_color_manual(name = "Percentiles",
-                           values = c(q1 = benchmarks1,
-                                      q2 = benchmarks2,
-                                      q3 = benchmarks3),
-                           labels = c(q1 = q1_label,
-                                      q2 = q2_label,
-                                      q3 = q3_label))+
+                           values = c("16.65th" = benchmarks1,
+                                      "50th" = benchmarks2,
+                                      "83.35th" = benchmarks3))+
         theme(legend.position = "bottom",
               panel.spacing = unit(2, "lines"),
               legend.title = element_text(size=14),

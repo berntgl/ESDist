@@ -20,7 +20,7 @@ esd_table(
 
 \item{es}{Column name of effect sizes.}
 
-\item{grouping_var}{Column name of grouping variable/}
+\item{grouping_var}{Column name of grouping variable.}
 
 \item{method}{Defaults to 'quads', can also be 'thirds'.}
 

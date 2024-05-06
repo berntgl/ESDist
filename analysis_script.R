@@ -89,37 +89,40 @@ plot5
 # Unfortunately, a lot of published empirical results are prone to biases, such
 # as publication bias. The metasens package (Schwarzer et al., 2023) uses
 # limit meta-analysis to adjust individual effect sizes for publication bias.
-# using the esd_plot_pba() function, we can plot the distribution of adjusted
-# effect sizes against the distribution of unadjusted effect sizes. First, we
-# create a meta-object (m1), based on the effect sizes and corresponding
-# standard error in our dataset. Next, we create an object of class 'limitmeta',
-# (l1) which we can then use in our esd_plot_pba() function. The resulting plot
-# automatically generates a visualisation for the summary effect size and the
-# corresponding 95% CI.
+# The esd_plot_pba() function uses the limitmeta function from metasens to plot
+# the distribution of adjusted effect sizes against the distribution of
+# unadjusted effect sizes. We only need to add one new argument, "se", which
+# corresponds to the column with standard error. Alternatively, we can create a
+# separate object of the class "limitmeta" by loading the meta and metasens
+# packages and using the metagen and limitmeta functions, respectively. Instead
+# of defining df, es, and se as function arguments, we can then define a single
+# lim_obj variable. However, in the following examples, we follow the former
+# method.
 
-ot_dat <- subset(ot_dat, sei != 0)
-
-install.packages("meta", "metasens")
-library(meta)
-library(metasens)
-
-m1 <- metagen(TE = ot_dat$yi, seTE = ot_dat$sei)
-l1 <- limitmeta(m1)
-
-plot6 <- esd_plot_pba(lim_obj = l1, es_type = "Hedges' g")
+plot6 <- esd_plot_pba(df = ot_dat,
+                      es = yi,
+                      se = sei,
+                      es_type = "Hedges' g",
+                      method = "quads")
 plot6
+
+
 
 # We can also visualise the adjusted effect size benchmarks for our
 # distribution, by setting the method argument. We save the result to plot7.
 
-plot7 <- esd_plot_pba(lim_obj = l1,
-                       es_type = "Hedges' g",
-                       method = "quads")
+plot7 <- esd_plot_pba(df = ot_dat,
+                      es = yi,
+                      se = sei,
+                      es_type = "Hedges' g",
+                      method = "quads")
 plot7
 
 # Finally, we can visualise the range of detectable ESs based on a sesoi.
 
-plot8 <- esd_plot_pba(lim_obj = l1,
+plot8 <- esd_plot_pba(df = ot_dat,
+                      es = yi,
+                      se = sei,
                       es_type = "Hedges' g",
                       sesoi = 0.3)
 plot8

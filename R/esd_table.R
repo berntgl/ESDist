@@ -2,7 +2,7 @@
 #'
 #' @param df Dataset.
 #' @param es Column name of effect sizes.
-#' @param grouping_var Column name of grouping variable/
+#' @param grouping_var Column name of grouping variable.
 #' @param method Defaults to 'quads', can also be 'thirds'.
 #' @param min_group_size Sets the minimum amount of effect sizes needed to
 #' include a group in the table. Defaults to 3.

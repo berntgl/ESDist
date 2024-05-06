@@ -6,8 +6,11 @@
 publication bias}
 \usage{
 esd_table_pba(
-  lim_obj,
-  grouping = FALSE,
+  df = NULL,
+  es = NULL,
+  se = NULL,
+  lim_obj = NULL,
+  grouping_var = NULL,
   method = "quads",
   min_group_size = 3,
   csv_write = FALSE,
@@ -16,10 +19,15 @@ esd_table_pba(
 )
 }
 \arguments{
+\item{df}{Dataset.}
+
+\item{es}{Column name of effect sizes.}
+
+\item{se}{Column name of standard error.}
+
 \item{lim_obj}{An object of class "limitmeta".}
 
-\item{grouping}{Defaults to FALSE. When set to TRUE, will detect subgrouping
-of the lim_obj and calculate benchmarks for each group.}
+\item{grouping_var}{Column name of grouping variable.}
 
 \item{method}{Defaults to 'quads', can also be 'thirds'.}
 
@@ -43,11 +51,7 @@ Creating a table for field-specific effect size benchmarks, adjusted for
 publication bias
 }
 \examples{
-m2 <- meta::metagen(TE = ot_dat$yi,
-                    seTE = ot_dat$sei,
-                    subgroup = ot_dat$group)
-l2 <- metasens::limitmeta(m2)
-esd_table_pba(lim_obj = l2, grouping = TRUE)
+esd_table_pba(df = ot_dat, es = yi, se = sei, grouping = TRUE)
 
 
 }

@@ -1,9 +1,11 @@
 #' Creating a table for field-specific effect size benchmarks, adjusted for
 #' publication bias
 #'
+#' @param df Dataset.
+#' @param es Column name of effect sizes.
+#' @param se Column name of standard error.
 #' @param lim_obj An object of class "limitmeta".
-#' @param grouping Defaults to FALSE. When set to TRUE, will detect subgrouping
-#' of the lim_obj and calculate benchmarks for each group.
+#' @param grouping_var Column name of grouping variable.
 #' @param method Defaults to 'quads', can also be 'thirds'.
 #' @param min_group_size Sets the minimum amount of effect sizes needed to
 #' include a group in the table. Defaults to 3.
@@ -18,22 +20,36 @@
 #' @export
 #'
 #' @examples
-#' m2 <- meta::metagen(TE = ot_dat$yi,
-#'                     seTE = ot_dat$sei,
-#'                     subgroup = ot_dat$group)
-#' l2 <- metasens::limitmeta(m2)
-#' esd_table_pba(lim_obj = l2, grouping = TRUE)
+#' esd_table_pba(df = ot_dat, es = yi, se = sei, grouping = TRUE)
 #'
 #'
-esd_table_pba <- function(lim_obj,
-                          grouping = FALSE,
+esd_table_pba <- function(df = NULL,
+                          es = NULL,
+                          se = NULL,
+                          lim_obj = NULL,
+                          grouping_var = NULL,
                           method = "quads",
                           min_group_size = 3,
                           csv_write = FALSE,
                           path_file_name = "esd_table.csv",
                           ndec = 2) {
+
+  if (!missing(df) & missing(grouping_var)) {
+    df = as.data.frame(df)
+    meta_obj <- metagen(TE = df[, deparse(substitute(es))],
+                        seTE = df[, deparse(substitute(se))])
+    lim_obj <- limitmeta(meta_obj)
+  } else if (!missing(df) & length(df[, deparse(substitute(grouping_var))]) > 1) {
+    df = as.data.frame(df)
+    meta_obj <- metagen(TE = df[, deparse(substitute(es))],
+                        seTE = df[, deparse(substitute(se))],
+                        subgroup = df[, deparse(substitute(grouping_var))])
+    lim_obj <- limitmeta(meta_obj)
+  }
+
+
   stopifnot(class(lim_obj) == "limitmeta")
-  if (isTRUE(grouping)) {
+  if (!missing(grouping_var)) {
     df <- data.frame(lim_obj[1], # TE
                      lim_obj[3], # TE.limit
                      lim_obj[6], # TE.random
@@ -63,7 +79,7 @@ esd_table_pba <- function(lim_obj,
 
 
 
-  if(isFALSE(grouping)) {
+  if(missing(grouping_var)) {
     if(method == "quads") {
       es_values <- df %>%
         summarise(cdq25 = round(quantile(TE_abs, prob = .25, na.rm = TRUE), ndec),
