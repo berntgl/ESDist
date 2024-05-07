@@ -22,15 +22,12 @@ with:
 ``` r
 library(devtools)
 devtools::install_github("berntgl/ESDist")
-#> utf8    (1.2.3 -> 1.2.4) [CRAN]
-#> vctrs   (0.6.3 -> 0.6.4) [CRAN]
-#> fansi   (1.0.4 -> 1.0.5) [CRAN]
-#> ggplot2 (3.4.3 -> 3.4.4) [CRAN]
+#> stringi (1.8.3 -> 1.8.4) [CRAN]
 #> 
 #> The downloaded binary packages are in
-#>  /var/folders/j7/lmhpj_jj73qfc31klr2wh3vw0000gp/T//Rtmp0NjmSX/downloaded_packages
+#>  /var/folders/j7/lmhpj_jj73qfc31klr2wh3vw0000gp/T//RtmprxVlCV/downloaded_packages
 #> ── R CMD build ─────────────────────────────────────────────────────────────────
-#> * checking for file ‘/private/var/folders/j7/lmhpj_jj73qfc31klr2wh3vw0000gp/T/Rtmp0NjmSX/remotesca616aeeb2f/berntgl-ESDist-b4c73d8/DESCRIPTION’ ... OK
+#> * checking for file ‘/private/var/folders/j7/lmhpj_jj73qfc31klr2wh3vw0000gp/T/RtmprxVlCV/remotesc32840e81f19/berntgl-ESDist-56b171b/DESCRIPTION’ ... OK
 #> * preparing ‘ESDist’:
 #> * checking DESCRIPTION meta-information ... OK
 #> * checking for LF line-endings in source and make files and shell scripts
@@ -97,8 +94,8 @@ library(ESDist)
 
 ``` r
 plot1 <- esd_plot(df = ot_dat,
-         es = yi,
-         es_type = "Hedges' g")
+                  es = yi,
+                  es_type = "Hedges' g")
 
 plot1
 ```
@@ -113,9 +110,9 @@ It is also possible to plot effect size benchmarks based on the 25th,
 
 ``` r
 plot2 <- esd_plot(df = ot_dat,
-         es = yi,
-         es_type = "Hedges' g",
-         method = "quads")
+                  es = yi,
+                  es_type = "Hedges' g",
+                  method = "quads")
 
 plot2
 ```
@@ -129,9 +126,9 @@ larger than a specified `sesoi`.
 
 ``` r
 plot3 <- esd_plot(df = ot_dat,
-         es = yi,
-         es_type = "Hedges' g",
-         sesoi = 0.3)
+                  es = yi,
+                  es_type = "Hedges' g",
+                  sesoi = 0.3)
 
 plot3
 ```
@@ -148,9 +145,9 @@ sizes.
 
 ``` r
 plot4 <- esd_plot_group(df = ot_dat,
-         es = yi,
-         es_type = "Hedges' g",
-         grouping_var = group)
+                        es = yi,
+                        es_type = "Hedges' g",
+                        grouping_var = group)
 
 plot4
 ```
@@ -165,10 +162,10 @@ adding `method = "quads"` or `method = "thirds"`.
 
 ``` r
 plot5 <- esd_plot_group(df = ot_dat,
-         es = yi,
-         es_type = "Hedges' g",
-         grouping_var = group,
-         method = "quads")
+                        es = yi,
+                        es_type = "Hedges' g",
+                        grouping_var = group,
+                        method = "quads")
 
 plot5
 ```
@@ -179,58 +176,69 @@ plot5
 
 ### Plot an adjusted ESD against a raw ESD.
 
-Using the `meta` and `metasens` packages (Schwarzer et al., 2023), we
-can adjust every individual effect size for publication bias, and plot
-the adjusted distribution against theraw distribution.
+Using limit meta analysis (Schwarzer et al., 2023), we can adjust every
+individual effect size for publication bias and plot the adjusted
+distribution against the raw distribution. To do this, the
+`esd_plot_pba()` function takes an additional `se` argument.
 
-First, we need to import the `meta` and `metasens` packages
+``` r
+plot6a <- esd_plot_pba(df = ot_dat,
+                       es = yi,
+                       se = sei,
+                       es_type = "Hedges' g")
+
+plot6a
+```
+
+![](man/figures/README-unnamed-chunk-10-1.png)<!-- -->
+
+For more control over the parameters of the limit meta-analysis, it is
+possible to install the `meta` and `metasens` packages and creating a
+`limitmeta` object. The `esd_plot_pba()` function can then take a
+lim_obj argument instead of `df`, `es`, and `se` arguments.
 
 ``` r
 library(meta)
 library(metasens)
-```
 
-Next, we create an object of class ‘meta’ (m1), and subsequently use
-this to create an object of class ‘limitmeta’ (l1).
-
-``` r
 m1 <- metagen(TE = ot_dat$yi, seTE = ot_dat$sei)
 l1 <- limitmeta(m1)
+
+plot6b <- esd_plot_pba(lim_obj = l1, 
+                       es_type = "Hedges' g")
+
+plot6b
 ```
 
-We can now use the `l1` object to create our distribution.
-
-``` r
-plot6 <- esd_plot_pba(lim_obj = l1, 
-          es_type = "Hedges' g")
-
-plot6
-```
-
-![](man/figures/README-unnamed-chunk-12-1.png)<!-- -->
+![](man/figures/README-unnamed-chunk-11-1.png)<!-- -->
 
 Alternatively, we can plot the effect size benchmarks for both
 distributions.
 
 ``` r
-plot7 <- esd_plot_pba(lim_obj = l1, 
-          es_type = "Hedges' g",
-          method = "quads")
+plot7 <- esd_plot_pba(df = ot_dat,
+                      es = yi,
+                      se = sei,
+                      es_type = "Hedges' g",
+                      method = "quads")
+
 plot7
 ```
 
-![](man/figures/README-unnamed-chunk-13-1.png)<!-- -->
+![](man/figures/README-unnamed-chunk-12-1.png)<!-- -->
 
 Or the range of effect sizes larger than or equal to a SESOI
 
 ``` r
-plot8 <- esd_plot_pba(l1, 
-          "Hedges' g",
-          sesoi = 0.3)
+plot8 <- esd_plot_pba(df = ot_dat,
+                      es = yi,
+                      se = sei,
+                      es_type = "Hedges' g",
+                      sesoi = 0.3)
 plot8
 ```
 
-![](man/figures/README-unnamed-chunk-14-1.png)<!-- -->
+![](man/figures/README-unnamed-chunk-13-1.png)<!-- -->
 
 ## esd_table()
 
@@ -282,12 +290,14 @@ table3
 
 ## esd_table_pba()
 
-The `esd_table_pba()` function allows users to use an object of type
-`limitmeta` to calculate benchmarks based on effect sizes that are
+The `esd_table_pba()` function, similar to the `esd_plot_pba()`
+function, allows users to calculate effect size benchmarks that are
 adjusted for publication bias.
 
 ``` r
-table4 <- esd_table_pba(lim_obj = l1)
+table4 <- esd_table_pba(df = ot_dat,
+                        es = yi,
+                        se = sei)
 
 table4
 #>                       25%  50%  75% Number of effects
@@ -296,19 +306,13 @@ table4
 ```
 
 In case the user wants effect size benchmarks per group, the user should
-define the `subgroup` argument when defining the `meta` object:
+define the `grouping_var` argument:
 
 ``` r
-m2 <- metagen(TE = ot_dat$yi, seTE = ot_dat$sei, subgroup = ot_dat$group)
-l2 <- limitmeta(m2)
-```
-
-Then, in the `esd_table_pba()` function, the `grouping` argument should
-be set to `TRUE`.
-
-``` r
-table5 <- esd_table_pba(lim_obj = l2,
-                    grouping = TRUE)
+table5 <- esd_table_pba(df = ot_dat,
+                        es = yi,
+                        se = sei,
+                        grouping_var = group)
 
 table5
 #>                        25%  50%  75% Number of effects
