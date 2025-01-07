@@ -22,18 +22,9 @@ with:
 ``` r
 library(devtools)
 devtools::install_github("berntgl/ESDist")
-#> stringi (1.8.3 -> 1.8.4) [CRAN]
-#> 
-#> The downloaded binary packages are in
-#>  /var/folders/j7/lmhpj_jj73qfc31klr2wh3vw0000gp/T//RtmprxVlCV/downloaded_packages
-#> ── R CMD build ─────────────────────────────────────────────────────────────────
-#> * checking for file ‘/private/var/folders/j7/lmhpj_jj73qfc31klr2wh3vw0000gp/T/RtmprxVlCV/remotesc32840e81f19/berntgl-ESDist-56b171b/DESCRIPTION’ ... OK
-#> * preparing ‘ESDist’:
-#> * checking DESCRIPTION meta-information ... OK
-#> * checking for LF line-endings in source and make files and shell scripts
-#> * checking for empty or unneeded directories
-#> * building ‘ESDist_0.0.0.9000.tar.gz’
 ```
+
+    #> ℹ Loading ESDist
 
 ### Data structure
 
@@ -100,7 +91,27 @@ plot1 <- esd_plot(df = ot_dat,
 plot1
 ```
 
-![](man/figures/README-unnamed-chunk-5-1.png)<!-- -->
+![](man/figures/README-unnamed-chunk-6-1.png)<!-- -->
+
+### Plot a weighted ESD
+
+By supplying standard errors to the `esd_plot()` function’s `se`
+argument, and setting `weighted` to `TRUE`, it is possible to plot a
+weighted ESD, based on the inverse standard error. This effectively
+means that more information is drawn from more precise effect size
+estimates (i.e., effect sizes with a smaller standard error).
+
+``` r
+plot2 <- esd_plot(df = ot_dat,
+                  es = yi,
+                  se = sei,
+                  weighted = TRUE,
+                  es_type = "Hedges' g")
+
+plot2
+```
+
+![](man/figures/README-unnamed-chunk-7-1.png)<!-- -->
 
 ### Plot effect size benchmarks
 
@@ -109,15 +120,15 @@ It is also possible to plot effect size benchmarks based on the 25th,
 16.65th, 50th, and 83.35th percentiles by adding `method = "thirds"`).
 
 ``` r
-plot2 <- esd_plot(df = ot_dat,
+plot3 <- esd_plot(df = ot_dat,
                   es = yi,
                   es_type = "Hedges' g",
                   method = "quads")
 
-plot2
+plot3
 ```
 
-![](man/figures/README-unnamed-chunk-6-1.png)<!-- -->
+![](man/figures/README-unnamed-chunk-8-1.png)<!-- -->
 
 ### Plot empirical effect size ranges
 
@@ -125,15 +136,16 @@ Finally, we can specify the range of effect sizes that is equal to or
 larger than a specified `sesoi`.
 
 ``` r
-plot3 <- esd_plot(df = ot_dat,
+plot4 <- esd_plot_pba(df = ot_dat,
                   es = yi,
+                  se = sei,
                   es_type = "Hedges' g",
                   sesoi = 0.3)
 
-plot3
+plot4
 ```
 
-![](man/figures/README-unnamed-chunk-7-1.png)<!-- -->
+![](man/figures/README-unnamed-chunk-9-1.png)<!-- -->
 
 ## esd_plot_group()
 
@@ -141,36 +153,19 @@ plot3
 
 The `esd_plot_group()` function allows for specifying a `grouping_var`
 to group data and create plots for each group with 20 or more effect
-sizes.
-
-``` r
-plot4 <- esd_plot_group(df = ot_dat,
-                        es = yi,
-                        es_type = "Hedges' g",
-                        grouping_var = group)
-
-plot4
-```
-
-![](man/figures/README-unnamed-chunk-8-1.png)<!-- -->
-
-### Plot effect size benchmarks per group.
-
-Like the `esd_plot()` function, the `esd_plot_group()` function lets you
-plot effect size benchmarks based on a specific set of percentiles, by
-adding `method = "quads"` or `method = "thirds"`.
+sizes. It otherwise takes the same arguments as the standard
+`esd_plot()` function (with the exception of the `sesoi` argument).
 
 ``` r
 plot5 <- esd_plot_group(df = ot_dat,
                         es = yi,
                         es_type = "Hedges' g",
-                        grouping_var = group,
-                        method = "quads")
+                        grouping_var = group)
 
 plot5
 ```
 
-![](man/figures/README-unnamed-chunk-9-1.png)<!-- -->
+![](man/figures/README-unnamed-chunk-10-1.png)<!-- -->
 
 ## esd_plot_pba()
 
@@ -179,66 +174,20 @@ plot5
 Using limit meta analysis (Schwarzer et al., 2023), we can adjust every
 individual effect size for publication bias and plot the adjusted
 distribution against the raw distribution. To do this, the
-`esd_plot_pba()` function takes an additional `se` argument.
+`esd_plot_pba()` function takes an additional `se` argument. Otherwise,
+it takes the same arguments as the `esd_plot()` function for additional
+functionality.
 
 ``` r
-plot6a <- esd_plot_pba(df = ot_dat,
+plot6 <- esd_plot_pba(df = ot_dat,
                        es = yi,
                        se = sei,
                        es_type = "Hedges' g")
 
-plot6a
-```
-
-![](man/figures/README-unnamed-chunk-10-1.png)<!-- -->
-
-For more control over the parameters of the limit meta-analysis, it is
-possible to install the `meta` and `metasens` packages and creating a
-`limitmeta` object. The `esd_plot_pba()` function can then take a
-lim_obj argument instead of `df`, `es`, and `se` arguments.
-
-``` r
-library(meta)
-library(metasens)
-
-m1 <- metagen(TE = ot_dat$yi, seTE = ot_dat$sei)
-l1 <- limitmeta(m1)
-
-plot6b <- esd_plot_pba(lim_obj = l1, 
-                       es_type = "Hedges' g")
-
-plot6b
+plot6
 ```
 
 ![](man/figures/README-unnamed-chunk-11-1.png)<!-- -->
-
-Alternatively, we can plot the effect size benchmarks for both
-distributions.
-
-``` r
-plot7 <- esd_plot_pba(df = ot_dat,
-                      es = yi,
-                      se = sei,
-                      es_type = "Hedges' g",
-                      method = "quads")
-
-plot7
-```
-
-![](man/figures/README-unnamed-chunk-12-1.png)<!-- -->
-
-Or the range of effect sizes larger than or equal to a SESOI
-
-``` r
-plot8 <- esd_plot_pba(df = ot_dat,
-                      es = yi,
-                      se = sei,
-                      es_type = "Hedges' g",
-                      sesoi = 0.3)
-plot8
-```
-
-![](man/figures/README-unnamed-chunk-13-1.png)<!-- -->
 
 ## esd_table()
 
@@ -271,11 +220,11 @@ benchmarks per group, for every group with at least three effect sizes.
 specifying `min_group_size`.)
 
 ``` r
-table3 <- esd_table(df = ot_dat,
+table2 <- esd_table(df = ot_dat,
                     es = yi,
                     grouping_var = group)
 
-table3
+table2
 #>          Group  25%  50%  75% Number of effects
 #> 1           AN 0.02 0.05 0.06                 6
 #> 2          ASD 0.11 0.31 0.55                32
@@ -288,11 +237,30 @@ table3
 #> 9          All 0.06 0.24 0.50               182
 ```
 
+### Calculate effect size benchmarks from a weighted distribution
+
+By specifying `se` and setting `weighted` to `TRUE`, it is possible to
+calculate benchmark estimates from a distribution that is weighted by
+inverse standard error, taking more information from precise estimates
+(i.e., effect size estimates with a lower standard error)
+
+``` r
+table3 <- esd_table(df = ot_dat,
+                    es = yi,
+                    se = sei,
+                    weighted = TRUE)
+
+table3
+#>                  25% 50%  75% Number of effects
+#> Raw effect size 0.05 0.2 0.43               182
+```
+
 ## esd_table_pba()
 
 The `esd_table_pba()` function, similar to the `esd_plot_pba()`
 function, allows users to calculate effect size benchmarks that are
-adjusted for publication bias.
+adjusted for publication bias. Otherwise, this function takes the same
+additional arguments as the standard `esd_table()` function.
 
 ``` r
 table4 <- esd_table_pba(df = ot_dat,
@@ -303,37 +271,6 @@ table4
 #>                       25%  50%  75% Number of effects
 #> Raw effect size      0.06 0.24 0.50               182
 #> Adjusted effect size 0.08 0.20 0.39               182
-```
-
-In case the user wants effect size benchmarks per group, the user should
-define the `grouping_var` argument:
-
-``` r
-table5 <- esd_table_pba(df = ot_dat,
-                        es = yi,
-                        se = sei,
-                        grouping_var = group)
-
-table5
-#>                        25%  50%  75% Number of effects
-#> AN                    0.02 0.05 0.06                 6
-#> AN adjusted           0.04 0.07 0.09                 6
-#> ASD                   0.11 0.31 0.55                32
-#> ASD adjusted          0.10 0.23 0.39                32
-#> BPD                   0.16 1.22 2.29                 5
-#> BPD adjusted          0.19 0.92 1.82                 5
-#> PTSD                  0.20 0.32 0.38                 6
-#> PTSD adjusted         0.12 0.22 0.29                 6
-#> SCZ                   0.05 0.13 0.24                20
-#> SCZ adjusted          0.08 0.15 0.18                20
-#> anxiety               0.19 0.31 0.41                 4
-#> anxiety adjusted      0.06 0.21 0.36                 4
-#> depression            0.21 0.45 0.91                 6
-#> depression adjusted   0.14 0.37 0.72                 6
-#> neurotypical          0.05 0.25 0.66                89
-#> neurotypical adjusted 0.06 0.20 0.55                89
-#> All                   0.06 0.24 0.50               182
-#> All adjusted          0.08 0.20 0.39               182
 ```
 
 ### Editing and saving tables

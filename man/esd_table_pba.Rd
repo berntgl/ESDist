@@ -11,6 +11,7 @@ esd_table_pba(
   se = NULL,
   lim_obj = NULL,
   grouping_var = NULL,
+  weighted = FALSE,
   method = "quads",
   min_group_size = 3,
   csv_write = FALSE,
@@ -28,6 +29,9 @@ esd_table_pba(
 \item{lim_obj}{An object of class "limitmeta".}
 
 \item{grouping_var}{Column name of grouping variable.}
+
+\item{weighted}{Defaults to FALSE. When set to TRUE, will calculate the
+weighted distribution based on the inverse standard error.}
 
 \item{method}{Defaults to 'quads', can also be 'thirds'.}
 

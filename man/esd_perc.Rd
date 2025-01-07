@@ -4,7 +4,7 @@
 \alias{esd_perc}
 \title{Calculate the percentile of an ESD corresponding to a specific value}
 \usage{
-esd_perc(df, es, value, method = "exclusive")
+esd_perc(df, es, value, se = NULL, weighted = FALSE, method = "exclusive")
 }
 \arguments{
 \item{df}{Dataset}
@@ -12,6 +12,11 @@ esd_perc(df, es, value, method = "exclusive")
 \item{es}{Column name of effect sizes}
 
 \item{value}{The value of the effect size of interest}
+
+\item{se}{Column name of standard error.}
+
+\item{weighted}{Defaults to FALSE. When set to TRUE, will calculate the
+weighted distribution based on the inverse standard error.}
 
 \item{method}{Specifies method, defaults to 'exclusive' but can also be
 'inclusive' or 'grouped'.}

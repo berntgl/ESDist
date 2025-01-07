@@ -2,6 +2,9 @@
 #'
 #' @param df Dataset.
 #' @param es Column name of effect sizes.
+#' @param se Column name of standard error.
+#' @param weighted Defaults to FALSE. When set to TRUE, will calculate the
+#'  weighted distribution based on the inverse standard error.
 #' @param grouping_var Column name of grouping variable.
 #' @param method Defaults to 'quads', can also be 'thirds'.
 #' @param min_group_size Sets the minimum amount of effect sizes needed to
@@ -12,6 +15,7 @@
 #' '.csv').
 #' @param ndec The number of decimal places in which all values should be
 #' reported. Defaults to 2.
+#'
 #' @return A table.
 #' @export
 #'
@@ -21,6 +25,8 @@
 #'
 esd_table <- function(df,
                       es,
+                      se = NULL,
+                      weighted = FALSE,
                       grouping_var = NULL,
                       method = "quads",
                       min_group_size = 3,
@@ -29,18 +35,29 @@ esd_table <- function(df,
                       ndec = 2) {
   df <- as.data.frame(df)
   df$es <- abs(df[, deparse(substitute(es))])
+
+  if (isTRUE(weighted)) {
+    stopifnot(!missing(se))
+    df$se <- df[, deparse(substitute(se))]
+    df$weights <- 1 / df$se
+  } else {
+    df$weights <- 1
+  }
+
+
+
   if(missing(grouping_var)) {
     if(method == "quads") {
       es_values <- df %>%
-        summarise(cdq25 = round(quantile(es, prob = .25, na.rm = TRUE), ndec),
-                  cdq50 = round(quantile(es, prob = .50, na.rm = TRUE), ndec),
-                  cdq75 = round(quantile(es, prob = .75, na.rm = TRUE), ndec),
+        summarise(cdq25 = round(wtd.quantile(es, weights = weights, prob = .25, na.rm = TRUE), ndec),
+                  cdq50 = round(wtd.quantile(es, weights = weights, prob = .50, na.rm = TRUE), ndec),
+                  cdq75 = round(wtd.quantile(es, weights = weights, prob = .75, na.rm = TRUE), ndec),
                   count = n())
     } else if (method == "thirds") {
       es_values <- df %>%
-        summarise(cdq16 = round(quantile(es, prob = .1665, na.rm = TRUE), ndec),
-                  cdq50 = round(quantile(es, prob = .50, na.rm = TRUE), ndec),
-                  cdq83 = round(quantile(es, prob = .8335, na.rm = TRUE), ndec),
+        summarise(cdq16 = round(wtd.quantile(es, weights = weights, prob = .1665, na.rm = TRUE), ndec),
+                  cdq50 = round(wtd.quantile(es, weights = weights, prob = .50, na.rm = TRUE), ndec),
+                  cdq83 = round(wtd.quantile(es, weights = weights, prob = .8335, na.rm = TRUE), ndec),
                   count = n())
     } else {
       return(warning("Please enter a valid method"))
@@ -55,30 +72,30 @@ esd_table <- function(df,
         # mutate({{ grouping_var }} := as.character({{ grouping_var }})) %>%
         # bind_rows(mutate(., {{grouping_var}} := "All")) %>%
         group_by({{ grouping_var }}) %>%
-        summarise(cdq25 = round(quantile(es, prob = .25, na.rm = TRUE), ndec),
-                  cdq50 = round(quantile(es, prob = .50, na.rm = TRUE), ndec),
-                  cdq75 = round(quantile(es, prob = .75, na.rm = TRUE), ndec),
+        summarise(cdq25 = round(wtd.quantile(es, weights = weights, prob = .25, na.rm = TRUE), ndec),
+                  cdq50 = round(wtd.quantile(es, weights = weights, prob = .50, na.rm = TRUE), ndec),
+                  cdq75 = round(wtd.quantile(es, weights = weights, prob = .75, na.rm = TRUE), ndec),
                   count = n()) %>%
         ungroup() %>%
         bind_rows(df %>% summarise({{grouping_var}} := "All",
-                                   cdq25 = round(quantile(es, prob = .25, na.rm = TRUE), ndec),
-                                   cdq50 = round(quantile(es, prob = .50, na.rm = TRUE), ndec),
-                                   cdq75 = round(quantile(es, prob = .75, na.rm = TRUE), ndec),
+                                   cdq25 = round(wtd.quantile(es, weights = weights, prob = .25, na.rm = TRUE), ndec),
+                                   cdq50 = round(wtd.quantile(es, weights = weights, prob = .50, na.rm = TRUE), ndec),
+                                   cdq75 = round(wtd.quantile(es, weights = weights, prob = .75, na.rm = TRUE), ndec),
                                    count = n()))
     } else if (method == "thirds") {
       es_values <- df %>%
         # mutate({{grouping_var}} := as.character({{grouping_var}})) %>%
         # bind_rows(mutate(., {{grouping_var}} := "All")) %>%
         group_by({{ grouping_var }}) %>%
-        summarise(cdq16 = round(quantile(es, prob = .1665, na.rm = TRUE), ndec),
-                  cdq50 = round(quantile(es, prob = .50, na.rm = TRUE), ndec),
-                  cdq83 = round(quantile(es, prob = .8335, na.rm = TRUE), ndec),
+        summarise(cdq16 = round(wtd.quantile(es, weights = weights, prob = .1665, na.rm = TRUE), ndec),
+                  cdq50 = round(wtd.quantile(es, weights = weights, prob = .50, na.rm = TRUE), ndec),
+                  cdq83 = round(wtd.quantile(es, weights = weights, prob = .8335, na.rm = TRUE), ndec),
                   count = n()) %>%
         ungroup() %>%
         bind_rows(df %>% summarise({{grouping_var}} := "All",
-                                   cdq16 = round(quantile(es, prob = .1665, na.rm = TRUE), ndec),
-                                   cdq50 = round(quantile(es, prob = .50, na.rm = TRUE), ndec),
-                                   cdq83 = round(quantile(es, prob = .8335, na.rm = TRUE), ndec),
+                                   cdq16 = round(wtd.quantile(es, weights = weights, prob = .1665, na.rm = TRUE), ndec),
+                                   cdq50 = round(wtd.quantile(es, weights = weights, prob = .50, na.rm = TRUE), ndec),
+                                   cdq83 = round(wtd.quantile(es, weights = weights, prob = .8335, na.rm = TRUE), ndec),
                                    count = n()))
     } else {
       return("Please enter a valid method")

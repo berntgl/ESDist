@@ -7,6 +7,8 @@
 esd_table(
   df,
   es,
+  se = NULL,
+  weighted = FALSE,
   grouping_var = NULL,
   method = "quads",
   min_group_size = 3,
@@ -19,6 +21,11 @@ esd_table(
 \item{df}{Dataset.}
 
 \item{es}{Column name of effect sizes.}
+
+\item{se}{Column name of standard error.}
+
+\item{weighted}{Defaults to FALSE. When set to TRUE, will calculate the
+weighted distribution based on the inverse standard error.}
 
 \item{grouping_var}{Column name of grouping variable.}
 

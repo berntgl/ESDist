@@ -9,6 +9,8 @@ esd_plot_group(
   es,
   es_type,
   grouping_var,
+  se = NULL,
+  weighted = FALSE,
   method = FALSE,
   mean = FALSE,
   abs = FALSE,
@@ -25,6 +27,11 @@ esd_plot_group(
 "Cohen's d")}
 
 \item{grouping_var}{Column name of grouping variable}
+
+\item{se}{Column name of standard error.}
+
+\item{weighted}{Defaults to FALSE. When set to TRUE, will calculate the
+weighted distribution based on the inverse standard error.}
 
 \item{method}{Defaults to FALSE, but can be 'quads' or 'thirds'}
 

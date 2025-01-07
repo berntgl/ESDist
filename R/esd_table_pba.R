@@ -6,6 +6,8 @@
 #' @param se Column name of standard error.
 #' @param lim_obj An object of class "limitmeta".
 #' @param grouping_var Column name of grouping variable.
+#' @param weighted Defaults to FALSE. When set to TRUE, will calculate the
+#'  weighted distribution based on the inverse standard error.
 #' @param method Defaults to 'quads', can also be 'thirds'.
 #' @param min_group_size Sets the minimum amount of effect sizes needed to
 #' include a group in the table. Defaults to 3.
@@ -28,6 +30,7 @@ esd_table_pba <- function(df = NULL,
                           se = NULL,
                           lim_obj = NULL,
                           grouping_var = NULL,
+                          weighted = FALSE,
                           method = "quads",
                           min_group_size = 3,
                           csv_write = FALSE,
@@ -51,7 +54,9 @@ esd_table_pba <- function(df = NULL,
   stopifnot(class(lim_obj) == "limitmeta")
   if (!missing(grouping_var)) {
     df <- data.frame(lim_obj[1], # TE
+                     lim_obj[2], # seTE
                      lim_obj[3], # TE.limit
+                     lim_obj[4], # seTE.limit
                      lim_obj[6], # TE.random
                      lim_obj[8], # lower.random
                      lim_obj[9], # upper.random
@@ -61,11 +66,13 @@ esd_table_pba <- function(df = NULL,
                      lim_obj[["x"]][["byvar"]])
     df$TE_abs <- abs(df$TE)
     df$TE.limit_abs <- abs(df$TE.limit)
-    colnames(df)[9] <- "byvar"
+    colnames(df)[11] <- "byvar"
     df <- as.data.frame(df)
   } else {
     df <- data.frame(lim_obj[1], # TE
+                     lim_obj[2], # seTE
                      lim_obj[3], # TE.limit
+                     lim_obj[4], # seTE.limit
                      lim_obj[6], # TE.random
                      lim_obj[8], # lower.random
                      lim_obj[9], # upper.random
@@ -77,26 +84,32 @@ esd_table_pba <- function(df = NULL,
     df <- as.data.frame(df)
   }
 
-
+  if (isTRUE(weighted)) {
+    df$weights <- 1 / df$seTE
+    df$weights.limit <- 1 / df$seTE.limit
+  } else {
+    df$weights <- 1
+    df$weights.limit <- 1
+  }
 
   if(missing(grouping_var)) {
     if(method == "quads") {
       es_values <- df %>%
-        summarise(cdq25 = round(quantile(TE_abs, prob = .25, na.rm = TRUE), ndec),
-                  cdq25_adj = round(quantile(TE.limit_abs , prob = .25, na.rm = TRUE), ndec),
-                  cdq50 = round(quantile(TE_abs, prob = .50, na.rm = TRUE), ndec),
-                  cdq50_adj = round(quantile(TE.limit_abs, prob = .5, na.rm = TRUE), ndec),
-                  cdq75 = round(quantile(TE_abs, prob = .75, na.rm = TRUE), ndec),
-                  cdq75_adj = round(quantile(TE.limit_abs, prob = .75, na.rm = TRUE), ndec),
+        summarise(cdq25 = round(wtd.quantile(TE_abs, weights = weights, prob = .25, na.rm = TRUE), ndec),
+                  cdq25_adj = round(wtd.quantile(TE.limit_abs, weights = weights.limit, prob = .25, na.rm = TRUE), ndec),
+                  cdq50 = round(wtd.quantile(TE_abs, weights = weights, prob = .50, na.rm = TRUE), ndec),
+                  cdq50_adj = round(wtd.quantile(TE.limit_abs, weights = weights.limit, prob = .5, na.rm = TRUE), ndec),
+                  cdq75 = round(wtd.quantile(TE_abs, weights = weights, prob = .75, na.rm = TRUE), ndec),
+                  cdq75_adj = round(wtd.quantile(TE.limit_abs, weights = weights.limit, prob = .75, na.rm = TRUE), ndec),
                   count = n())
     } else if (method == "thirds") {
       es_values <- df %>%
-        summarise(cdq16 = round(quantile(TE_abs, prob = .1665, na.rm = TRUE), ndec),
-                  cdq16_adj = round(quantile(TE.limit_abs, prob = .1665, na.rm = TRUE), ndec),
-                  cdq50 = round(quantile(TE_abs, prob = .50, na.rm = TRUE), ndec),
-                  cdq50_adj = round(quantile(TE.limit_abs, prob = .5, na.rm = TRUE), ndec),
-                  cdq83 = round(quantile(TE_abs, prob = .8335, na.rm = TRUE), ndec),
-                  cdq83_adj = round(quantile(TE.limit_abs, prob = .8335, na.rm = TRUE), ndec),
+        summarise(cdq16 = round(wtd.quantile(TE_abs, weights = weights, prob = .1665, na.rm = TRUE), ndec),
+                  cdq16_adj = round(wtd.quantile(TE.limit_abs, weights = weights.limit, prob = .1665, na.rm = TRUE), ndec),
+                  cdq50 = round(wtd.quantile(TE_abs, weights = weights, prob = .50, na.rm = TRUE), ndec),
+                  cdq50_adj = round(wtd.quantile(TE.limit_abs, weights = weights.limit, prob = .5, na.rm = TRUE), ndec),
+                  cdq83 = round(wtd.quantile(TE_abs, weights = weights, prob = .8335, na.rm = TRUE), ndec),
+                  cdq83_adj = round(wtd.quantile(TE.limit_abs, weights = weights.limit, prob = .8335, na.rm = TRUE), ndec),
                   count = n())
     } else {
       return(warning("Please enter a valid method"))
@@ -119,42 +132,42 @@ esd_table_pba <- function(df = NULL,
         # mutate({{ grouping_var }} := as.character({{ grouping_var }})) %>%
         # bind_rows(mutate(., {{grouping_var}} := "All")) %>%
         group_by(byvar) %>%
-        summarise(cdq25 = round(quantile(TE_abs, prob = .25, na.rm = TRUE), ndec),
-                  cdq25_adj = round(quantile(TE.limit_abs, prob = .25, na.rm = TRUE), ndec),
-                  cdq50 = round(quantile(TE_abs, prob = .50, na.rm = TRUE), ndec),
-                  cdq50_adj = round(quantile(TE.limit_abs, prob = .5, na.rm = TRUE), ndec),
-                  cdq75 = round(quantile(TE_abs, prob = .75, na.rm = TRUE), ndec),
-                  cdq75_adj = round(quantile(TE.limit_abs, prob = .75, na.rm = TRUE), ndec),
+        summarise(cdq25 = round(wtd.quantile(TE_abs, weights = weights, prob = .25, na.rm = TRUE), ndec),
+                  cdq25_adj = round(wtd.quantile(TE.limit_abs, weights = weights.limit, prob = .25, na.rm = TRUE), ndec),
+                  cdq50 = round(wtd.quantile(TE_abs, weights = weights, prob = .50, na.rm = TRUE), ndec),
+                  cdq50_adj = round(wtd.quantile(TE.limit_abs, weights = weights.limit, prob = .5, na.rm = TRUE), ndec),
+                  cdq75 = round(wtd.quantile(TE_abs, weights = weights, prob = .75, na.rm = TRUE), ndec),
+                  cdq75_adj = round(wtd.quantile(TE.limit_abs, weights = weights.limit, prob = .75, na.rm = TRUE), ndec),
                   count = n()) %>%
         ungroup() %>%
         bind_rows(df %>% summarise(byvar := "All",
-                                   cdq25 = round(quantile(TE_abs, prob = .25, na.rm = TRUE), ndec),
-                                   cdq25_adj = round(quantile(TE.limit_abs, prob = .25, na.rm = TRUE), ndec),
-                                   cdq50 = round(quantile(TE_abs, prob = .50, na.rm = TRUE), ndec),
-                                   cdq50_adj = round(quantile(TE.limit_abs, prob = .5, na.rm = TRUE), ndec),
-                                   cdq75 = round(quantile(TE_abs, prob = .75, na.rm = TRUE), ndec),
-                                   cdq75_adj = round(quantile(TE.limit_abs, prob = .75, na.rm = TRUE), ndec),
+                                   cdq25 = round(wtd.quantile(TE_abs, weights = weights, prob = .25, na.rm = TRUE), ndec),
+                                   cdq25_adj = round(wtd.quantile(TE.limit_abs, weights = weights.limit, prob = .25, na.rm = TRUE), ndec),
+                                   cdq50 = round(wtd.quantile(TE_abs, weights = weights, prob = .50, na.rm = TRUE), ndec),
+                                   cdq50_adj = round(wtd.quantile(TE.limit_abs, weights = weights.limit, prob = .5, na.rm = TRUE), ndec),
+                                   cdq75 = round(wtd.quantile(TE_abs, weights = weights, prob = .75, na.rm = TRUE), ndec),
+                                   cdq75_adj = round(wtd.quantile(TE.limit_abs, weights = weights.limit, prob = .75, na.rm = TRUE), ndec),
                                    count = n()))
     } else if (method == "thirds") {
       es_values <- df %>%
         # mutate({{grouping_var}} := as.character({{grouping_var}})) %>%
         # bind_rows(mutate(., {{grouping_var}} := "All")) %>%
         group_by(byvar) %>%
-        summarise(cdq16 = round(quantile(TE_abs, prob = .1665, na.rm = TRUE), ndec),
-                  cdq16_adj = round(quantile(TE.limit_abs, prob = .1665, na.rm = TRUE), ndec),
-                  cdq50 = round(quantile(TE_abs, prob = .50, na.rm = TRUE), ndec),
-                  cdq50_adj = round(quantile(TE.limit_abs, prob = .5, na.rm = TRUE), ndec),
-                  cdq83 = round(quantile(TE_abs, prob = .8335, na.rm = TRUE), ndec),
-                  cdq83_adj = round(quantile(TE.limit_abs, prob = .8335, na.rm = TRUE), ndec),
+        summarise(cdq16 = round(wtd.quantile(TE_abs, weights = weights, prob = .1665, na.rm = TRUE), ndec),
+                  cdq16_adj = round(wtd.quantile(TE.limit_abs, weights = weights.limit, prob = .1665, na.rm = TRUE), ndec),
+                  cdq50 = round(wtd.quantile(TE_abs, weights = weights, prob = .50, na.rm = TRUE), ndec),
+                  cdq50_adj = round(wtd.quantile(TE.limit_abs, weights = weights.limit, prob = .5, na.rm = TRUE), ndec),
+                  cdq83 = round(wtd.quantile(TE_abs, weights = weights, prob = .8335, na.rm = TRUE), ndec),
+                  cdq83_adj = round(wtd.quantile(TE.limit_abs, weights = weights.limit, prob = .8335, na.rm = TRUE), ndec),
                   count = n()) %>%
         ungroup() %>%
         bind_rows(df %>% summarise(byvar := "All",
-                                   cdq16 = round(quantile(TE_abs, prob = .1665, na.rm = TRUE), ndec),
-                                   cdq16_adj = round(quantile(TE.limit_abs, prob = .1665, na.rm = TRUE), ndec),
-                                   cdq50 = round(quantile(TE_abs, prob = .50, na.rm = TRUE), ndec),
-                                   cdq50_adj = round(quantile(TE.limit_abs, prob = .5, na.rm = TRUE), ndec),
-                                   cdq83 = round(quantile(TE_abs, prob = .8335, na.rm = TRUE), ndec),
-                                   cdq83_adj = round(quantile(TE.limit_abs, prob = .8335, na.rm = TRUE), ndec),
+                                   cdq16 = round(wtd.quantile(TE_abs, weights = weights, prob = .1665, na.rm = TRUE), ndec),
+                                   cdq16_adj = round(wtd.quantile(TE.limit_abs, weights = weights.limit, prob = .1665, na.rm = TRUE), ndec),
+                                   cdq50 = round(wtd.quantile(TE_abs, weights = weights, prob = .50, na.rm = TRUE), ndec),
+                                   cdq50_adj = round(wtd.quantile(TE.limit_abs, weights = weights.limit, prob = .5, na.rm = TRUE), ndec),
+                                   cdq83 = round(wtd.quantile(TE_abs, weights = weights, prob = .8335, na.rm = TRUE), ndec),
+                                   cdq83_adj = round(wtd.quantile(TE.limit_abs, weights = weights.limit, prob = .8335, na.rm = TRUE), ndec),
                                    count = n()))
 
     } else {

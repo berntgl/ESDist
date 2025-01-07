@@ -4,6 +4,9 @@
 #' @param es Column name of effect sizes.
 #' @param es_type A string describing the type of effect size used (e.g.,
 #'   "Cohen's d").
+#' @param se Column name of stanard error.
+#' @param weighted Defaults to FALSE. When set to TRUE, will calculate the
+#'  weighted distribution based on the inverse standard error.
 #' @param method Defaults to FALSE, can also be 'thirds' for 16.65th, 50th, and
 #'   83.35th percentiles, or 'quads' for 25th, 50th, and 75th percentiles.
 #' @param mean Defaults to NULL, but will insert a ggplot geom_vline element
@@ -28,6 +31,8 @@
 esd_plot <- function(df,
                      es,
                      es_type,
+                     se = NULL,
+                     weighted = FALSE,
                      method = FALSE,
                      mean = NULL,
                      sesoi = NULL,
@@ -46,45 +51,57 @@ esd_plot <- function(df,
   accent <- "#D5A42C"
 
   df <- as.data.frame(df)
-  es_col <- df[, deparse(substitute(es))]
-  es_col_abs <- abs(df[, deparse(substitute(es))])
+  df$es_col <- df[, deparse(substitute(es))]
+  df$es_col_abs <- abs(df$es_col)
 
   if (!isFALSE(method) | !missing(sesoi)) {
     abs = TRUE
   }
 
+  if (isTRUE(weighted)) {
+    stopifnot(!missing(se))
+    y_label <- "Weighted count"
+    df$se <- df[, deparse(substitute(se))]
+    df$weights <- 1 / df$se
+  } else {
+    y_label <- "Count"
+    df$weights <- 1
+  }
+
+
   if(isFALSE(abs)) {
     plot <- ggplot(data = df) +
-      geom_histogram(aes(es_col), fill = primary_dark, binwidth = bin_width) +
+      geom_histogram(aes(es_col, weight = weights), fill = primary_dark, binwidth = bin_width) +
       #scale_x_continuous(breaks = seq(0, 3, 0.5)) +
-      labs(x = es_type, y = "Frequency")+
+      labs(x = es_type, y = y_label)+
       theme_minimal() +
       theme(axis.text = element_text(size=12),
             axis.title = element_text(size=20))
   } else if (!isFALSE(abs)) {
     if (missing(sesoi)){
       plot <- ggplot(data = df) +
-        geom_histogram(aes(es_col_abs), fill = primary_dark, binwidth = bin_width, center = (bin_width / 2)) +
+        geom_histogram(aes(es_col_abs, weight = weights), fill = primary_dark, binwidth = bin_width, center = (bin_width / 2)) +
         #scale_x_continuous(breaks = seq(0, 3, 0.5)) +
-        labs(x = es_type, y = "Frequency")+
+        labs(x = es_type, y = y_label)+
         theme_minimal() +
         theme(axis.text = element_text(size=12),
               axis.title = element_text(size=20))
     } else {
-      rank <- length(es_col_abs[es_col_abs < sesoi])/length(es_col_abs) * 100
+      rank <- sum(df$weights[df$es_col < sesoi]) / sum(df$weights) * 100
+
       rank_rev <- 100 - rank
 
       rank_perc <- sprintf("%.2f%%", rank)
       rank_rev_perc <- sprintf("%.2f%%", rank_rev)
 
       plot <- ggplot(data = df) +
-        geom_histogram(aes(es_col_abs, fill = after_stat(x) > sesoi),
+        geom_histogram(aes(es_col_abs, weight = weights, fill = after_stat(x) > sesoi),
                        binwidth = bin_width,
                        center = (bin_width / 2)) +
         scale_fill_manual(name = sprintf("ES < or > %.2f", sesoi),
                           labels = c(rank_perc, rank_rev_perc),
                           values = c(secondary_light, primary_dark)) +
-        labs(x = es_type, y = "Frequency")+
+        labs(x = es_type, y = y_label)+
         theme_minimal()+
         theme(legend.position = c(0.9, 0.7),
               legend.background = element_rect(fill="#dde7f0", color = "#dde7f0"),
@@ -101,50 +118,51 @@ esd_plot <- function(df,
 
   if (!isFALSE(method)) {
     if (method == "quads") {
-    q1 <- quantile(es_col_abs, prob = 0.25)
-    q1_label <- "25th"
-    q2 <- quantile(es_col_abs, prob = 0.50)
-    q2_label <- "50th"
-    q3 <- quantile(es_col_abs, prob = 0.75)
-    q3_label <- "75th"
+      quantiles <- wtd.quantile(df$es_col_abs, weights = df$weights, probs = c(0.25, 0.5, 0.75))
+      q1_label <- "25th"
+      q2_label <- "50th"
+      q3_label <- "75th"
 
-    plot <- plot +
-      geom_vline(aes(xintercept = q1, color = "q1"),
-                 linetype = "dashed",
-                 size = 1) +
-      geom_vline(aes(xintercept = q2,
-                     color = "q2"),
-                 linetype = "dashed",
-                 size = 1) +
-      geom_vline(aes(xintercept = q3, color = "q3"),
-                 linetype = "dashed",
-                 size = 1) +
-      scale_color_manual(name = "Percentiles",
-                         values = c(q1 = benchmarks1,
-                                    q2 = benchmarks2,
-                                    q3 = benchmarks3),
-                         labels = c(q1 = q1_label,
-                                    q2 = q2_label,
-                                    q3 = q3_label))+
-      theme(legend.position = c(0.9, 0.7),
-            legend.background = element_rect(fill="#dde7f0",
-                                             color = "#dde7f0"))
+      plot <- plot +
+        geom_vline(aes(xintercept = quantiles[1],
+                       color = "q1"),
+                   linetype = "dashed",
+                   size = 1) +
+        geom_vline(aes(xintercept = quantiles[2],
+                       color = "q2"),
+                   linetype = "dashed",
+                   size = 1) +
+        geom_vline(aes(xintercept = quantiles[3],
+                       color = "q3"),
+                   linetype = "dashed",
+                   size = 1) +
+        scale_color_manual(name = "Percentiles",
+                           values = c(q1 = benchmarks1,
+                                      q2 = benchmarks2,
+                                      q3 = benchmarks3),
+                           labels = c(q1 = q1_label,
+                                      q2 = q2_label,
+                                      q3 = q3_label))+
+        theme(legend.position = c(0.9, 0.7),
+              legend.background = element_rect(fill="#dde7f0",
+                                               color = "#dde7f0"))
 
     } else if (method == "thirds") {
-      q1 <- quantile(es_col_abs, prob = 0.1665)
+      quantiles <- wtd.quantile(df$es_col_abs, weights = df$weights, probs = c(0.1665, 0.5, 0.8335))
       q1_label <- "16.65th"
-      q2 <- quantile(es_col_abs, prob = 0.50)
       q2_label <- "50th"
-      q3 <- quantile(es_col_abs, prob = 0.8335)
       q3_label <- "83.35th"
       plot <- plot +
-        geom_vline(aes(xintercept = q1, color = "q1"),
+        geom_vline(aes(xintercept = quantiles[1],
+                       color = "q1"),
                    linetype = "dashed",
                    size = 1) +
-        geom_vline(aes(xintercept = q2, color = "q2"),
+        geom_vline(aes(xintercept = quantiles[2],
+                       color = "q2"),
                    linetype = "dashed",
                    size = 1) +
-        geom_vline(aes(xintercept = q3, color = "q3"),
+        geom_vline(aes(xintercept = quantiles[3],
+                       color = "q3"),
                    linetype = "dashed",
                    size = 1) +
         scale_color_manual(name = "Percentiles",

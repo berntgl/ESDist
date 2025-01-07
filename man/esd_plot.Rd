@@ -8,6 +8,8 @@ esd_plot(
   df,
   es,
   es_type,
+  se = NULL,
+  weighted = FALSE,
   method = FALSE,
   mean = NULL,
   sesoi = NULL,
@@ -22,6 +24,11 @@ esd_plot(
 
 \item{es_type}{A string describing the type of effect size used (e.g.,
 "Cohen's d").}
+
+\item{se}{Column name of stanard error.}
+
+\item{weighted}{Defaults to FALSE. When set to TRUE, will calculate the
+weighted distribution based on the inverse standard error.}
 
 \item{method}{Defaults to FALSE, can also be 'thirds' for 16.65th, 50th, and
 83.35th percentiles, or 'quads' for 25th, 50th, and 75th percentiles.}

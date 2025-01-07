@@ -10,6 +10,7 @@ esd_plot_pba(
   se = NULL,
   lim_obj = NULL,
   es_type,
+  weighted = FALSE,
   sesoi = NULL,
   sum_es = TRUE,
   method = FALSE,
@@ -29,6 +30,9 @@ esd_plot_pba(
 
 \item{es_type}{A string describing the type of effect size used (e.g.,
 "Cohen's d").}
+
+\item{weighted}{Defaults to FALSE. When set to TRUE, will calculate the
+weighted distribution based on the inverse standard error.}
 
 \item{sesoi}{A numeric argument that corresponds to the population ES of
 interest. This will split the histogram into two parts around the inputted

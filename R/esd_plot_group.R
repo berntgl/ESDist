@@ -5,6 +5,9 @@
 #' @param es_type A string describing the type of effect size used (e.g.,
 #'   "Cohen's d")
 #' @param grouping_var Column name of grouping variable
+#' @param se Column name of standard error.
+#' @param weighted Defaults to FALSE. When set to TRUE, will calculate the
+#'  weighted distribution based on the inverse standard error.
 #' @param method Defaults to FALSE, but can be 'quads' or 'thirds'
 #' @param mean Defaults to FALSE, but will insert a ggplot geom_vline element
 #'   that corresponds to the mean effect size
@@ -27,6 +30,8 @@ esd_plot_group <- function(df,
                            es,
                            es_type,
                            grouping_var,
+                           se = NULL,
+                           weighted = FALSE,
                            method = FALSE,
                            mean = FALSE,
                            abs = FALSE,
@@ -39,26 +44,36 @@ esd_plot_group <- function(df,
   primary_light <- "#C6DFE8"
   secondary_dark <- "#BBBBBB"
   secondary_light <- "#E7E7E7"
-  benchmarks1 <- "#FFADA0"
+  benchmarks1 <- "#FF8C77"
   benchmarks2 <- "#D5462C"
-  benchmarks3 <- "#110301"
-  accent <- "#FFCF57"
+  benchmarks3 <- "#921B05"
+  accent <- "#D5A42C"
 
   df <- as.data.frame(df)
-  df$es_abs <- abs(df[, deparse(substitute(es))])
+  df$es_col <- df[, deparse(substitute(es))]
+  df$es_col_abs <- abs(df[, deparse(substitute(es))])
 
   if (!isFALSE(method)) {
     abs = TRUE
   }
 
-  dat_b <- df %>%
+  if (isTRUE(weighted)) {
+    stopifnot(!missing(se))
+    y_label <- "Weighted count"
+    df$se <- df[, deparse(substitute(se))]
+    df$weights <- 1 / df$se
+  } else {
+    y_label <- "Count"
+    df$weights <- 1
+  }
+
+  df <- df %>%
     group_by({{grouping_var}}) %>%
-    mutate(mean = mean(es_abs),
-           q16 = quantile(es_abs, prob = 0.1665),
-           q25 = quantile(es_abs, prob = 0.25),
-           q50 = quantile(es_abs, prob = 0.50),
-           q75 = quantile(es_abs, prob = 0.75),
-           q83 = quantile(es_abs, prob = 0.8335),
+    mutate(q16 = wtd.quantile(es_col_abs, weights = weights, prob = 0.1665),
+           q25 = wtd.quantile(es_col_abs, weights = weights, prob = 0.25),
+           q50 = wtd.quantile(es_col_abs, weights = weights, prob = 0.5),
+           q75 = wtd.quantile(es_col_abs, weights = weights, prob = 0.75),
+           q83 = wtd.quantile(es_col_abs, weights = weights, prob = 0.8335),
            count = n()) %>%
     filter(count >= min_group_size) %>%
     ungroup()
@@ -68,11 +83,10 @@ esd_plot_group <- function(df,
   q75_label <- "75th"
   q83_label <- "83.35th"
 
-
   if(isFALSE(abs)) {
-    plot <- ggplot(data = dat_b)+
-      geom_histogram(aes({{es}}), fill = primary_dark, binwidth = bin_width)+
-      labs(x = es_type, y = "Frequency")+
+    plot <- ggplot(data = df)+
+      geom_histogram(aes(es_col, weight = weights), fill = primary_dark, binwidth = bin_width)+
+      labs(x = es_type, y = y_label)+
       theme_minimal() +
       facet_grid(vars({{grouping_var}}),
                  switch = "y")+
@@ -83,9 +97,9 @@ esd_plot_group <- function(df,
             legend.position = "bottom",
             panel.spacing = unit(2, "lines"))
   } else if (!isFALSE(abs)) {
-    plot <- ggplot(data = dat_b)+
-      geom_histogram(aes(es_abs), fill = primary_dark, binwidth = bin_width, center = (bin_width / 2))+
-      labs(x = es_type, y = "Frequency")+
+    plot <- ggplot(data = df)+
+      geom_histogram(aes(es_col_abs, weight = weights), fill = primary_dark, binwidth = bin_width, center = (bin_width / 2))+
+      labs(x = es_type, y = y_label)+
       theme_minimal() +
       facet_grid(vars({{grouping_var}}),
                  switch = "y")+
@@ -97,6 +111,7 @@ esd_plot_group <- function(df,
             panel.spacing = unit(2, "lines"))
     if (!isFALSE(method)) {
       if (method == "quads") {
+
         plot <- plot +
           geom_vline(aes(xintercept = q25, color = "q25"),
                      linetype = "dashed",
@@ -115,6 +130,7 @@ esd_plot_group <- function(df,
                                         q50 = q50_label,
                                         q75 = q75_label))
       } else if (method == "thirds") {
+
         plot <- plot+
           geom_vline(aes(xintercept = q16, color = "q16"),
                      linetype = "dashed",

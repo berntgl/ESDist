@@ -6,6 +6,8 @@
 #' @param lim_obj An object of class "limitmeta".
 #' @param es_type A string describing the type of effect size used (e.g.,
 #'   "Cohen's d").
+#' @param weighted Defaults to FALSE. When set to TRUE, will calculate the
+#'  weighted distribution based on the inverse standard error.
 #' @param sesoi A numeric argument that corresponds to the population ES of
 #'   interest. This will split the histogram into two parts around the inputted
 #'   value.
@@ -35,6 +37,7 @@ esd_plot_pba <- function(df = NULL,
                          se = NULL,
                          lim_obj = NULL,
                          es_type,
+                         weighted = FALSE,
                          sesoi = NULL,
                          sum_es = TRUE,
                          method = FALSE,
@@ -61,7 +64,9 @@ esd_plot_pba <- function(df = NULL,
 
   stopifnot(class(lim_obj) == "limitmeta")
   df <- data.frame(lim_obj[1], # TE
+                   lim_obj[2], # seTE
                    lim_obj[3], # TE.limit
+                   lim_obj[4], # seTE.limit
                    lim_obj[6], # TE.random
                    lim_obj[8], # lower.random
                    lim_obj[9], # upper.random
@@ -79,13 +84,23 @@ esd_plot_pba <- function(df = NULL,
     sum_es = FALSE
   }
 
+  if (isTRUE(weighted)) {
+    y_label <- "Weighted count"
+    df$weights <- 1 / df$seTE
+    df$weights.limit = 1 / df$seTE.limit
+  } else {
+    y_label <- "Count"
+    df$weights <- 1
+    df$weights.limit <- 1
+  }
+
   if (isFALSE(abs)) {
     plot <- ggplot(data = df) +
-      geom_histogram(aes(x = TE), fill=primary_light, binwidth = bin_width) +
-      geom_histogram(aes(x = TE.limit, y = -after_stat(count)), fill = primary_dark, binwidth = bin_width) +
+      geom_histogram(aes(x = TE, weight = weights), fill=primary_light, binwidth = bin_width) +
+      geom_histogram(aes(x = TE.limit, y = -after_stat(count), weight = weights.limit), fill = primary_dark, binwidth = bin_width) +
       theme_minimal() +
       geom_hline(aes(yintercept = 0), size = 0.2)+
-      labs(x = es_type, y = "Frequency")+
+      labs(x = es_type, y = y_label)+
       theme(
         axis.text = element_text(size=12),
         axis.title = element_text(size=20))+
@@ -93,20 +108,24 @@ esd_plot_pba <- function(df = NULL,
   } else if (!isFALSE(abs)) {
     if (missing(sesoi)){
       plot <- ggplot(data = df) +
-        geom_histogram(aes(x = TE_abs), fill=primary_light, binwidth = bin_width, center = (bin_width / 2)) +
-        geom_histogram(aes(x = TE.limit_abs, y = -after_stat(count)), fill = primary_dark, binwidth = bin_width, center = (bin_width / 2)) +
+        geom_histogram(aes(x = TE_abs, weight = weights), fill=primary_light, binwidth = bin_width, center = (bin_width / 2)) +
+        geom_histogram(aes(x = TE.limit_abs, y = -after_stat(count), weight = weights.limit), fill = primary_dark, binwidth = bin_width, center = (bin_width / 2)) +
         theme_minimal() +
         geom_hline(aes(yintercept = 0), size = 0.2)+
-        labs(x = es_type, y = "Frequency")+
+        labs(x = es_type, y = y_label)+
         theme(
           axis.text = element_text(size=12),
           axis.title = element_text(size=20))+
         scale_y_continuous(labels = function(x) abs(x))
     } else {
-      rank_random <- length(df$TE_abs[df$TE_abs < sesoi])/length(df$TE_abs) * 100
+      rank_random <- ifelse(isTRUE(weighted),
+             sum(df$weights[df$TE_abs < sesoi]) / sum(df$weights) * 100,
+             length(df$TE_abs[df$TE_abs < sesoi])/length(df$TE_abs) * 100)
       rank_rev_random <- 100 - rank_random
 
-      rank_adjust <- length(df$TE.limit_abs[df$TE.limit_abs < sesoi])/length(df$TE.limit_abs) * 100
+      rank_adjust <- ifelse(isTRUE(weighted),
+                            sum(df$weights.limit[df$TE.limit_abs < sesoi]) / sum(df$weights.limit) * 100,
+                            length(df$TE.limit_abs[df$TE.limit_abs < sesoi])/length(df$TE.limit_abs) * 100)
       rank_rev_adjust <- 100 - rank_adjust
 
       rank_perc_random <- sprintf("%.2f%%", rank_random)
@@ -116,14 +135,14 @@ esd_plot_pba <- function(df = NULL,
       rank_rev_perc_adjust <- sprintf("%.2f%%", rank_rev_adjust)
 
       plot <- ggplot(data = df) +
-        geom_histogram(aes(x = TE_abs, fill = ifelse(after_stat(x) > sesoi, "B", "A")), binwidth = bin_width, center = (bin_width / 2)) +
-        geom_histogram(aes(x = TE.limit_abs, y = -after_stat(count), fill = ifelse(after_stat(x) > sesoi, "D", "C")), binwidth = bin_width, center = (bin_width / 2)) +
+        geom_histogram(aes(x = TE_abs, weight = weights, fill = ifelse(after_stat(x) > sesoi, "B", "A")), binwidth = bin_width, center = (bin_width / 2)) +
+        geom_histogram(aes(x = TE.limit_abs, y = -after_stat(count), weight = weights.limit, fill = ifelse(after_stat(x) > sesoi, "D", "C")), binwidth = bin_width, center = (bin_width / 2)) +
         theme_minimal() +
         geom_hline(aes(yintercept = 0), size = 0.2)+
         scale_fill_manual(name = sprintf("ES < or > %.2f", sesoi),
                           labels = c("A" = rank_perc_random, "B" = rank_rev_perc_random, "C" = rank_perc_adjust, "D" = rank_rev_perc_adjust),
                           values = c("A" = secondary_light, "B" = primary_light, "C" = secondary_dark, "D" = primary_dark)) +
-        labs(x = es_type, y = "Frequency")+
+        labs(x = es_type, y = y_label)+
         theme(legend.position = "bottom",
               #legend.background = element_rect(fill="#dde7f0", color = "#dde7f0"),
               legend.title = element_text(size=14, hjust = 0.5),
@@ -168,8 +187,8 @@ esd_plot_pba <- function(df = NULL,
   } else if (!isFALSE(method) & isFALSE(sum_es)) {
     if (method == "quads") {
       annotation <- data.frame(
-        x1 = c(quantile(df$TE_abs, prob = 0.25), quantile(df$TE_abs, prob = 0.50), quantile(df$TE_abs, prob = 0.75)),
-        x2 = c(quantile(df$TE.limit_abs, prob = 0.25), quantile(df$TE.limit_abs, prob = 0.5), quantile(df$TE.limit_abs, prob = 0.75)),
+        x1 = c(wtd.quantile(df$TE_abs, weights = df$weights, prob = 0.25), wtd.quantile(df$TE_abs, weights = df$weights, prob = 0.50), wtd.quantile(df$TE_abs, weights = df$weights, prob = 0.75)),
+        x2 = c(wtd.quantile(df$TE.limit_abs, weights = df$weights.limit, prob = 0.25), wtd.quantile(df$TE.limit_abs, weights = df$weights.limit, prob = 0.5), wtd.quantile(df$TE.limit_abs, weights = df$weights.limit, prob = 0.75)),
         label = c("25th", "50th", "75th")
       )
       plot <- plot +
@@ -193,8 +212,8 @@ esd_plot_pba <- function(df = NULL,
 
     } else if (method == "thirds") {
       annotation <- data.frame(
-        x1 = c(quantile(df$TE_abs, prob = 0.1665), quantile(df$TE_abs, prob = 0.50), quantile(df$TE_abs, prob = 0.8335)),
-        x2 = c(quantile(df$TE.limit_abs, prob = 0.1665), quantile(df$TE.limit_abs, prob = 0.5), quantile(df$TE.limit_abs, prob = 0.8335)),
+        x1 = c(wtd.quantile(df$TE_abs, weights = df$weights, prob = 0.1665), wtd.quantile(df$TE_abs, weights = df$weights, prob = 0.50), wtd.quantile(df$TE_abs, weights = df$weights, prob = 0.8335)),
+        x2 = c(wtd.quantile(df$TE.limit_abs, weights = df$weights.limit, prob = 0.1665), wtd.quantile(df$TE.limit_abs, weights = df$weights.limit, prob = 0.5), wtd.quantile(df$TE.limit_abs, weights = df$weights.limit, prob = 0.8335)),
         label = c("16.65th", "50th", "83.35th")
       )
 
