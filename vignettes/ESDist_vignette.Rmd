@@ -26,7 +26,7 @@ The `ESDist` package is designed to calculate and visualise field-specific
 effect size distributions, based on data that can easily be obtained from 
 meta-analyses.
 
-[![DOI](https://zenodo.org/badge/532824630.svg)](https://zenodo.org/badge/latestdoi/532824630)
+[![DOI](https://zenodo.org/badge/532824630.svg)](https://doi.org/10.5281/zenodo.8093616)
 
 
 ### Installation
