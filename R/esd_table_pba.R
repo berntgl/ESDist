@@ -180,6 +180,7 @@ esd_table_pba <- function(df = NULL,
     adj_values <- data.frame(matrix(nrow = (2 * nrow(es_values)), ncol = 4))
     adj_table_rownames <- c()
 
+    # Place each adjusted row after each raw effect size row.
     for (h in 1:nrow(es_values)) {
       adj_table_rownames[h*2-1] <- as.character(es_values[h,1])
       adj_table_rownames[h*2] <- as.character(paste(es_values[h,1], "adjusted", sep = " "))

@@ -11,6 +11,7 @@ esd_table(
   weighted = FALSE,
   grouping_var = NULL,
   method = "quads",
+  ci = FALSE,
   min_group_size = 3,
   csv_write = FALSE,
   path_file_name = "esd_table.csv",
@@ -29,7 +30,12 @@ weighted distribution based on the inverse standard error.}
 
 \item{grouping_var}{Column name of grouping variable.}
 
-\item{method}{Defaults to 'quads', can also be 'thirds'.}
+\item{method}{Defaults to 'quads', calculating the 25\%, 50\%, and 75\%
+percentiles. Can also be 'thirds', calculating the 16.65\%, 50\%, and 83.35\%
+percentiles.}
+
+\item{ci}{Defaults to "FALSE". When set to TRUE, will calculate bootstrapped
+estimates of each percentile, along with their 95\% CI.}
 
 \item{min_group_size}{Sets the minimum amount of effect sizes needed to
 include a group in the table. Defaults to 3.}

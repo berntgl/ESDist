@@ -1,12 +1,16 @@
 #' Creating a table for field-specific effect size benchmarks
 #'
-#' @param df Dataset.
+#' @param df dfset.
 #' @param es Column name of effect sizes.
 #' @param se Column name of standard error.
 #' @param weighted Defaults to FALSE. When set to TRUE, will calculate the
 #'  weighted distribution based on the inverse standard error.
 #' @param grouping_var Column name of grouping variable.
-#' @param method Defaults to 'quads', can also be 'thirds'.
+#' @param method Defaults to 'quads', calculating the 25%, 50%, and 75%
+#' percentiles. Can also be 'thirds', calculating the 16.65%, 50%, and 83.35%
+#' percentiles.
+#' @param ci Defaults to "FALSE". When set to TRUE, will calculate bootstrapped
+#' estimates of each percentile, along with their 95% CI.
 #' @param min_group_size Sets the minimum amount of effect sizes needed to
 #' include a group in the table. Defaults to 3.
 #' @param csv_write Defaults to FALSE. Will write the outputted table as a csv.
@@ -19,8 +23,7 @@
 #' @return A table.
 #' @export
 #'
-#' @examples
-#' esd_table(ot_dat, yi, grouping_var = group, method = "thirds")
+#' @examples esd_table(ot_dat, yi, grouping_var = group, method = "thirds")
 #'
 #'
 esd_table <- function(df,
@@ -28,97 +31,98 @@ esd_table <- function(df,
                       se = NULL,
                       weighted = FALSE,
                       grouping_var = NULL,
-                      method = "quads",
                       min_group_size = 3,
+                      method = "quads",
+                      ci = FALSE,
+                      n_bootstrap = 1000,
                       csv_write = FALSE,
                       path_file_name = "esd_table.csv",
                       ndec = 2) {
-  df <- as.data.frame(df)
-  df$es <- abs(df[, deparse(substitute(es))])
 
-  if (isTRUE(weighted)) {
-    stopifnot(!missing(se))
-    df$se <- df[, deparse(substitute(se))]
-    df$weights <- 1 / df$se
-  } else {
-    df$weights <- 1
+
+  # Define the probs based on the specified method
+  if (method == "quads") {
+    probs <- c(0.25, 0.5, 0.75)
+  } else if (method == "thirds") {
+    probs <- c(0.1665, 0.5, 0.8335)
   }
 
+  # Condition on a grouping var being specified
+  if (!is.null(df[[deparse(substitute(grouping_var))]])) {
+    # Initialise a results list
+    results <- list()
 
+    # Iterate over each unique group in the grouping variables
+    for (group in unique(df[[deparse(substitute(grouping_var))]])) {
+      # Create group-specific df
+      group_df <- df[df[[deparse(substitute(grouping_var))]] == group, ]
 
-  if(missing(grouping_var)) {
-    if(method == "quads") {
-      es_values <- df %>%
-        summarise(cdq25 = round(wtd.quantile(es, weights = weights, prob = .25, na.rm = TRUE), ndec),
-                  cdq50 = round(wtd.quantile(es, weights = weights, prob = .50, na.rm = TRUE), ndec),
-                  cdq75 = round(wtd.quantile(es, weights = weights, prob = .75, na.rm = TRUE), ndec),
-                  count = n())
-    } else if (method == "thirds") {
-      es_values <- df %>%
-        summarise(cdq16 = round(wtd.quantile(es, weights = weights, prob = .1665, na.rm = TRUE), ndec),
-                  cdq50 = round(wtd.quantile(es, weights = weights, prob = .50, na.rm = TRUE), ndec),
-                  cdq83 = round(wtd.quantile(es, weights = weights, prob = .8335, na.rm = TRUE), ndec),
-                  count = n())
-    } else {
-      return(warning("Please enter a valid method"))
-    }
-    es_values <- as.data.frame(es_values)
-    rownames(es_values) <- "Raw effect size"
-
-
-  } else {
-    if (method == "quads") {
-      es_values <- df %>%
-        # mutate({{ grouping_var }} := as.character({{ grouping_var }})) %>%
-        # bind_rows(mutate(., {{grouping_var}} := "All")) %>%
-        group_by({{ grouping_var }}) %>%
-        summarise(cdq25 = round(wtd.quantile(es, weights = weights, prob = .25, na.rm = TRUE), ndec),
-                  cdq50 = round(wtd.quantile(es, weights = weights, prob = .50, na.rm = TRUE), ndec),
-                  cdq75 = round(wtd.quantile(es, weights = weights, prob = .75, na.rm = TRUE), ndec),
-                  count = n()) %>%
-        ungroup() %>%
-        bind_rows(df %>% summarise({{grouping_var}} := "All",
-                                   cdq25 = round(wtd.quantile(es, weights = weights, prob = .25, na.rm = TRUE), ndec),
-                                   cdq50 = round(wtd.quantile(es, weights = weights, prob = .50, na.rm = TRUE), ndec),
-                                   cdq75 = round(wtd.quantile(es, weights = weights, prob = .75, na.rm = TRUE), ndec),
-                                   count = n()))
-    } else if (method == "thirds") {
-      es_values <- df %>%
-        # mutate({{grouping_var}} := as.character({{grouping_var}})) %>%
-        # bind_rows(mutate(., {{grouping_var}} := "All")) %>%
-        group_by({{ grouping_var }}) %>%
-        summarise(cdq16 = round(wtd.quantile(es, weights = weights, prob = .1665, na.rm = TRUE), ndec),
-                  cdq50 = round(wtd.quantile(es, weights = weights, prob = .50, na.rm = TRUE), ndec),
-                  cdq83 = round(wtd.quantile(es, weights = weights, prob = .8335, na.rm = TRUE), ndec),
-                  count = n()) %>%
-        ungroup() %>%
-        bind_rows(df %>% summarise({{grouping_var}} := "All",
-                                   cdq16 = round(wtd.quantile(es, weights = weights, prob = .1665, na.rm = TRUE), ndec),
-                                   cdq50 = round(wtd.quantile(es, weights = weights, prob = .50, na.rm = TRUE), ndec),
-                                   cdq83 = round(wtd.quantile(es, weights = weights, prob = .8335, na.rm = TRUE), ndec),
-                                   count = n()))
-    } else {
-      return("Please enter a valid method")
+      # Calculate percentiles for group
+      if (nrow(group_df) > min_group_size) {
+        if (ci) {
+          results[[group]] <- calculate_percentiles_ci(df = group_df,
+                                                       es = deparse(substitute(es)),
+                                                       se = deparse(substitute(se)),
+                                                       probs = probs,
+                                                       weighted = weighted,
+                                                       n_bootstrap = n_bootstrap)
+        } else {
+          results[[group]] <- calculate_percentiles(df = group_df,
+                                                    es = deparse(substitute(es)),
+                                                    se = deparse(substitute(se)),
+                                                    probs = probs,
+                                                    weighted = weighted)
+        }
+      }
     }
 
+    # Calculate overall percentiles
+    if (ci) {
+      results[["All"]] <- calculate_percentiles_ci(df = df,
+                                                   es = deparse(substitute(es)),
+                                                   se = deparse(substitute(se)),
+                                                   probs = probs,
+                                                   weighted = weighted,
+                                                   n_bootstrap = n_bootstrap)
+      # Combine results in a dataframe
+      results <- bind_rows(results, .id = "Group")
 
+      results <- as.data.frame(results)
 
+    } else {
+      results[["All"]] <- calculate_percentiles(df = df,
+                                                es = deparse(substitute(es)),
+                                                se = deparse(substitute(se)),
+                                                probs = probs,
+                                                weighted = weighted)
 
-    es_values <- es_values %>%
-      filter(count >= min_group_size)
-    es_values <- as.data.frame(es_values)
+      # Combine results in a dataframe
+      results <- bind_rows(results, .id = "Group")
+    }
+
+  } else {
+    if (ci) {
+
+      results <- calculate_percentiles_ci(df = df,
+                                          es = deparse(substitute(es)),
+                                          se = deparse(substitute(se)),
+                                          probs = probs,
+                                          weighted = weighted,
+                                          n_bootstrap = n_bootstrap)
+
+    } else {
+      results <- calculate_percentiles(df = df,
+                                       es = deparse(substitute(es)),
+                                       se = deparse(substitute(se)),
+                                       probs = probs,
+                                       weighted = weighted)
+    }
+
   }
-  ifelse(method == "thirds",
-    ifelse(missing(grouping_var),
-         colnames(es_values) <- c("16.65%", "50%", "83.35%", "Number of effects"),
-         colnames(es_values) <- c("Group", "16.65%", "50%", "83.35%", "Number of effects")),
-    ifelse(missing(grouping_var),
-           colnames(es_values) <- c("25%", "50%", "75%", "Number of effects"),
-           colnames(es_values) <- c("Group", "25%", "50%", "75%", "Number of effects")))
 
-
-  if (csv_write == TRUE) {
-    write.csv(es_values, file = path_file_name)
+  if (csv_write) {
+    write.csv(as.data.frame(results), file = path_file_name)
   }
-  return(es_values)
+
+  return(results)
 }
