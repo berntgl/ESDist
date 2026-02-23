@@ -1,37 +1,36 @@
-#' Creating a table for field-specific effect size benchmarks
+#' Create a table of effect size benchmarks.
 #'
-#' @param df dfset.
-#' @param es Column name of effect sizes.
-#' @param se Column name of standard error.
-#' @param weighted Defaults to FALSE. When set to TRUE, will calculate the
-#'  weighted distribution based on the inverse standard error.
+#' @param df A dataframe.
+#' @param es The effect size column.
+#' @param se The standard error column (defaults to NULL).
 #' @param grouping_var Column name of grouping variable.
-#' @param method Defaults to 'quads', calculating the 25%, 50%, and 75%
-#' percentiles. Can also be 'thirds', calculating the 16.65%, 50%, and 83.35%
-#' percentiles.
-#' @param ci Defaults to "FALSE". When set to TRUE, will calculate bootstrapped
-#' estimates of each percentile, along with their 95% CI.
-#' @param min_group_size Sets the minimum amount of effect sizes needed to
-#' include a group in the table. Defaults to 3.
+#' @param min_group_size Sets the minimum amount of effect sizes in each group
+#' as specified by the `grouping_var` variable. Defaults to 20.
+#' @param weighted Defaults to FALSE. If set to TRUE, will weight all effect
+#' sizes by their standard error (requires `se` to be defined).
+#' @param method Defaults to "quads". Can be set to "quads" (.25, .5, .75) or
+#' "thirds" (.1665, .5, .8335) to plot vertical lines based on the respective
+#'  benchmarks.
+#' @param ci Defaults to FALSE. If set to TRUE, will plot 95% CIs for each
+#' benchmark (requires `method` to be defined).
+#' @param n_bootstrap Number of bootstrapped samples for benchmark 95% CIs.
 #' @param csv_write Defaults to FALSE. Will write the outputted table as a csv.
 #' @param path_file_name A string containing the directory to which the .csv
 #' file will be saved, including the title of the .csv file (has to end in
 #' '.csv').
-#' @param ndec The number of decimal places in which all values should be
-#' reported. Defaults to 2.
+#' @param ndec Number of decimals. Defaults to 2.
 #'
-#' @return A table.
+#' @returns A table of class 'data.frame'.
 #' @export
 #'
-#' @examples esd_table(ot_dat, yi, grouping_var = group, method = "thirds")
-#'
-#'
+#' @examples esd_table(ot_dat, yi)
+#' @examples esd_table(ot_dat, yi, grouping_var = group)
 esd_table <- function(df,
                       es,
                       se = NULL,
-                      weighted = FALSE,
                       grouping_var = NULL,
                       min_group_size = 3,
+                      weighted = FALSE,
                       method = "quads",
                       ci = FALSE,
                       n_bootstrap = 1000,
@@ -39,6 +38,7 @@ esd_table <- function(df,
                       path_file_name = "esd_table.csv",
                       ndec = 2) {
 
+  #print(quo_name(grouping_var))
 
   # Define the probs based on the specified method
   if (method == "quads") {
@@ -52,8 +52,12 @@ esd_table <- function(df,
     # Initialise a results list
     results <- list()
 
+    # Arrange groups in alphabetical order
+    unique_groups <- unique(df[,deparse(substitute(grouping_var))])
+    unique_groups <- sort(unique_groups)
+
     # Iterate over each unique group in the grouping variables
-    for (group in unique(df[[deparse(substitute(grouping_var))]])) {
+    for (group in unique_groups) {
       # Create group-specific df
       group_df <- df[df[[deparse(substitute(grouping_var))]] == group, ]
 
@@ -76,6 +80,7 @@ esd_table <- function(df,
       }
     }
 
+
     # Calculate overall percentiles
     if (ci) {
       results[["All"]] <- calculate_percentiles_ci(df = df,
@@ -86,8 +91,6 @@ esd_table <- function(df,
                                                    n_bootstrap = n_bootstrap)
       # Combine results in a dataframe
       results <- bind_rows(results, .id = "Group")
-
-      results <- as.data.frame(results)
 
     } else {
       results[["All"]] <- calculate_percentiles(df = df,
@@ -100,6 +103,7 @@ esd_table <- function(df,
       results <- bind_rows(results, .id = "Group")
     }
 
+
   } else {
     if (ci) {
 
@@ -109,6 +113,8 @@ esd_table <- function(df,
                                           probs = probs,
                                           weighted = weighted,
                                           n_bootstrap = n_bootstrap)
+
+
 
     } else {
       results <- calculate_percentiles(df = df,

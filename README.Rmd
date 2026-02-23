@@ -127,24 +127,6 @@ plot4
 ```
 
 
-## esd_plot_group()
-### Simple plot per group
-
-The `esd_plot_group()` function allows for specifying a `grouping_var` to group 
-data and create plots for each group with 20 or more effect sizes. It otherwise
-takes the same arguments as the standard `esd_plot()` function (with the 
-exception of the `sesoi` argument).
-
-```{r, fig.height = 7}
-plot5 <- esd_plot_group(df = ot_dat,
-                        es = yi,
-                        es_type = "Hedges' g",
-                        grouping_var = group)
-
-plot5
-```
-
-
 ## esd_plot_pba()
 ### Plot an adjusted ESD against a raw ESD.
 Using limit meta analysis (Schwarzer et al., 2023), we can adjust every 
@@ -239,7 +221,7 @@ specific name.
 ## esd_perc()
 ### Calculating the percentile of a value
 Using `esd_perc()`, you can calculate to which percentile of the ESD a given 
-value corresponds. Note that absolute effect size values should be used.
+value corresponds.
 
 ```{r, message=FALSE, warning=FALSE}
 library(ESDist)

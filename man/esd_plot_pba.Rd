@@ -2,7 +2,7 @@
 % Please edit documentation in R/esd_plot_pba.R
 \name{esd_plot_pba}
 \alias{esd_plot_pba}
-\title{Creating an iceberg plot to visualise publication bias adjustment.}
+\title{Title}
 \usage{
 esd_plot_pba(
   df = NULL,
@@ -13,40 +13,41 @@ esd_plot_pba(
   weighted = FALSE,
   sesoi = NULL,
   sum_es = TRUE,
-  method = FALSE,
-  abs = FALSE,
+  method = NULL,
+  ci = FALSE,
   sum_es_type = "diamond",
-  bin_width = 0.1
+  bin_width = 0.1,
+  n_bootstrap = 1000
 )
 }
 \arguments{
-\item{df}{Dataset.}
+\item{df}{A dataframe.}
 
-\item{es}{Column name of effect sizes.}
+\item{es}{The effect size column.}
 
-\item{se}{Column name of standard error.}
+\item{se}{The standard error column (defaults to NULL).}
 
-\item{lim_obj}{An object of class "limitmeta".}
+\item{lim_obj}{A 'limitmeta' object.}
 
-\item{es_type}{A string describing the type of effect size used (e.g.,
-"Cohen's d").}
+\item{es_type}{A string specifying the type of effect size (for x-axis
+label).}
 
-\item{weighted}{Defaults to FALSE. When set to TRUE, will calculate the
-weighted distribution based on the inverse standard error.}
+\item{weighted}{Defaults to FALSE. If set to TRUE, will weight all effect
+sizes by their standard error (requires \code{se} to be defined).}
 
-\item{sesoi}{A numeric argument that corresponds to the population ES of
-interest. This will split the histogram into two parts around the inputted
-value.}
+\item{sesoi}{Defaults to NULL. When given a value, will calculate the
+percentage of (weighted) effect sizes larger (or equal to) this value.}
 
 \item{sum_es}{Defaults to TRUE. Plots the summary effect
 size and 95\% CI for both the distribution of raw effect sizes as well as
 the distribution of adjusted effect sizes.}
 
-\item{method}{Defaults to FALSE, can also be 'thirds' for 16.65th, 50th, and
-83.35th percentiles, or 'quads' for 25th, 50th, and 75th percentiles.}
+\item{method}{Defaults to NULL. Can be set to "quads" (.25, .5, .75) or
+"thirds" (.1665, .5, .8335) to plot vertical lines based on the respective
+benchmarks.}
 
-\item{abs}{Defaults to FALSE. If set to TRUE, plots all effect sizes as
-absolute values.}
+\item{ci}{Defaults to FALSE. If set to TRUE, will plot 95\% CIs for each
+benchmark (requires \code{method} to be defined).}
 
 \item{sum_es_type}{Defaults to "diamond". Sets the type of summary effect
 size visualisation. "diamond" will create a diamond shape centred around
@@ -54,16 +55,16 @@ the summary effect size, with the width of the diamond showing the 95\% CI.
 Can also be set to "dot", which shows a dot centred on the summary effect
 size, with lines and brackets showing the width of the 95\% CI.}
 
-\item{bin_width}{Numeric argument that corresponds to the bin width for the
-histogram. Defaults to 0.1}
+\item{bin_width}{Width of the histogram bins. Defaults to 0.1.}
+
+\item{n_bootstrap}{Number of bootstrapped samples for benchmark 95\% CIs.}
 }
 \value{
-A ggplot object.
+A 'ggplot' object.
 }
 \description{
-Creating an iceberg plot to visualise publication bias adjustment.
+Title
 }
 \examples{
-esd_plot_pba(df = ot_dat, es = yi, se = sei, es_type = "Cohen's d")
-
+esd_plot_pba(ot_dat, yi, sei)
 }
