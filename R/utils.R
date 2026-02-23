@@ -1,24 +1,22 @@
-
-#' Calculating percentiles with 95% CIs based on bootstrapping
+#' Calculate percentiles with bootstrapped 95% CI.
 #'
 #' @param df A dataframe.
-#' @param es A string with the name of the effect sizes column.
-#' @param se A string with the name of the std errors column.
-#' @param probs A vector of percentiles to compute. Will be automatically
-#' given by the esd_* functions based on the pre-specified ```method```
-#' argument.
-#' @param weightedAn argument which defaults to FALSE in the esd_* functions
-#' indicating whether the distribution should be weighted by the inverse
-#' variance.
-#' @param n_bootstrap Number of bootstrapped samples. Will be automatically
-#' given by the esd_* functions, but can be changed by the user.
-#' @keywords internal
-#' @returns A row containing the original percentiles and the bootstrapped
-#' percentiles (mean, median, and 95% CI for each percentile)
+#' @param es The effect size column.
+#' @param se The standard error column (defaults to NULL).
+#' @param probs A vector of quantiles ot compute. Given by parent function.
+#' @param weighted Defaults to FALSE. If set to TRUE, will weight all effect
+#' sizes by their standard error (requires `se` to be defined).
+#' @param n_bootstrap Number of bootstrapped samples for benchmark 95% CIs.
 #'
-#' @examples calculate_percentiles_ci(ot_dat, yi, sei, weighted, probs)
+#' @returns A table.
+#' @noRd
 #'
-calculate_percentiles_ci <- function(df, es, se, probs, weighted, n_bootstrap) {
+calculate_percentiles_ci <- function(df,
+                                     es,
+                                     se,
+                                     probs,
+                                     weighted,
+                                     n_bootstrap) {
   # Extract the effect sizes
   # Attempt to access the specified column
   es_col <- df[[es]]
@@ -64,49 +62,46 @@ calculate_percentiles_ci <- function(df, es, se, probs, weighted, n_bootstrap) {
   # and bootstrapped confidence intervals
   for (i in seq_along(probs)) {
     # Multiply by 100 and convert to integer for the probability names
-    quantile_name <- paste0(as.integer(probs[i] * 100), "_Original")
+    quantile_name <- paste0(as.integer(probs[i] * 100), "%")
     results_table[quantile_name] <- original_percentiles[i]
 
     # Add mean of bootstrapped quantiles
-    boot_mean_name <- paste0(as.integer(probs[i] * 100), "_Boot_Mean")
-    results_table[boot_mean_name] <- boot_mean_estimates[i]
+    #boot_mean_name <- paste0(as.integer(probs[i] * 100), "_Boot_Mean")
+    #results_table[boot_mean_name] <- boot_mean_estimates[i]
 
-    results_table[paste0(as.integer(probs[i] * 100), "_CI_Lower")] <- percentiles_estimates[1, i]
-    results_table[paste0(as.integer(probs[i] * 100), "_CI_Median")] <- percentiles_estimates[2, i]
-    results_table[paste0(as.integer(probs[i] * 100), "_CI_Upper")] <- percentiles_estimates[3, i]
+    results_table[paste0(as.integer(probs[i] * 100), "% CI Lower")] <- percentiles_estimates[1, i]
+    #results_table[paste0(as.integer(probs[i] * 100), "_CI_Median")] <- percentiles_estimates[2, i]
+    results_table[paste0(as.integer(probs[i] * 100), "% CI Upper")] <- percentiles_estimates[3, i]
   }
-  results_table["n"] <- length(es_col)
+  results_table <- as.data.frame(t(results_table))
+  results_table$n <- as.integer(length(es_col))
   return(results_table)
 }
 
-#' Calculating percentiles
+#' Calculate percentiles.
 #'
 #' @param df A dataframe.
-#' @param es A string with the name of the effect sizes column.
-#' @param se A string with the name of the std errors column.
-#' @param weighted An argument which defaults to FALSE in the esd_* functions
-#' indicating whether the distribution should be weighted by the inverse
-#' variance.
-#' @param probs A vector of percentiles to compute. Will be automatically
-#' provided by the esd_* functions based on the pre-specified ```method```
-#' argument.
-#' @keywords internal
-#' @returns A single row of
+#' @param es The effect size column.
+#' @param se The standard error column (defaults to NULL).
+#' @param weighted Defaults to FALSE. If set to TRUE, will weight all effect
+#' sizes by their standard error (requires `se` to be defined).
+#' @param probs A vector of quantiles ot compute. Given by parent function.
 #'
-#' @examples calculate_percentiles(ot_dat, yi, sei, weighted, probs)
+#' @returns A table.
+#' @noRd
 
-calculate_percentiles <- function(df, es, se, weighted, probs) {
+calculate_percentiles <- function(df, es, se = NULL, weighted = FALSE, probs) {
 
   es_col <- df[[es]]
-  se_col <- df[[se]]
 
   if (weighted) {
     stopifnot(!missing(se))
 
+    se_col <- df[[se]]
     # Calculate the weights using the inverse of the variance (1 / (se_col^2))
     weights <- 1 / (se_col^2)
   } else {
-    weights <- 1
+    weights <- rep(1, length(es_col))
   }
 
   # Calculate the percentiles, round to no. specified decimals
@@ -117,7 +112,7 @@ calculate_percentiles <- function(df, es, se, weighted, probs) {
   percentiles <- as.data.frame(t(percentiles))
 
   # Add no. of observations
-  percentiles$n <- length(es_col)
+  percentiles$n <- as.integer(length(es_col))
 
   return(percentiles)
 }

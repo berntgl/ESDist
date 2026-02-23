@@ -1,56 +1,62 @@
-#' Creating a table for field-specific effect size benchmarks, adjusted for
-#' publication bias
+#' Create a publication bias-adjusted table of effect size benchmarks.
 #'
-#' @param df Dataset.
-#' @param es Column name of effect sizes.
-#' @param se Column name of standard error.
-#' @param lim_obj An object of class "limitmeta".
+#' @param df A dataframe.
+#' @param es The effect size column.
+#' @param se The standard error column (defaults to NULL).
+#' @param lim_obj A 'limitmeta' object.
 #' @param grouping_var Column name of grouping variable.
-#' @param weighted Defaults to FALSE. When set to TRUE, will calculate the
-#'  weighted distribution based on the inverse standard error.
-#' @param method Defaults to 'quads', can also be 'thirds'.
-#' @param min_group_size Sets the minimum amount of effect sizes needed to
-#' include a group in the table. Defaults to 3.
+#' @param min_group_size Sets the minimum amount of effect sizes in each group
+#' as specified by the `grouping_var` variable. Defaults to 20.
+#' @param weighted Defaults to FALSE. If set to TRUE, will weight all effect
+#' sizes by their standard error (requires `se` to be defined).
+#' @param method Defaults to "quads". Can be set to "quads" (.25, .5, .75) or
+#' "thirds" (.1665, .5, .8335) to plot vertical lines based on the respective
+#'  benchmarks.
+#' @param ci Defaults to FALSE. If set to TRUE, will plot 95% CIs for each
+#' benchmark (requires `method` to be defined).
+#' @param n_bootstrap Number of bootstrapped samples for benchmark 95% CIs.
 #' @param csv_write Defaults to FALSE. Will write the outputted table as a csv.
 #' @param path_file_name A string containing the directory to which the .csv
 #' file will be saved, including the title of the .csv file (has to end in
 #' '.csv').
-#' @param ndec The number of decimal places in which all values should be
-#' reported. Defaults to 2.
+#' @param ndec Number of decimals. Defaults to 2.
 #'
-#' @return A table.
+#' @returns A table of class 'data.frame'.
 #' @export
 #'
-#' @examples
-#' esd_table_pba(df = ot_dat, es = yi, se = sei, grouping_var = group)
-#'
-#'
+#' @examples esd_table_pba(ot_dat, yi, sei)
+#' @examples esd_table_pba(ot_dat, yi, sei, grouping_var = group)
 esd_table_pba <- function(df = NULL,
                           es = NULL,
                           se = NULL,
                           lim_obj = NULL,
                           grouping_var = NULL,
+                          min_group_size = 3,
                           weighted = FALSE,
                           method = "quads",
-                          min_group_size = 3,
+                          ci = FALSE,
+                          n_bootstrap = 1000,
                           csv_write = FALSE,
                           path_file_name = "esd_table.csv",
                           ndec = 2) {
 
+  # Create limitmeta object with df, es, and se columns.
   if (!missing(df) & missing(grouping_var)) {
-    df = as.data.frame(df)
+    df <- as.data.frame(df)
     meta_obj <- metagen(TE = df[, deparse(substitute(es))],
                         seTE = df[, deparse(substitute(se))])
     lim_obj <- limitmeta(meta_obj)
   } else if (!missing(df) & length(df[, deparse(substitute(grouping_var))]) > 1) {
-    df = as.data.frame(df)
+
+    # Calculate publication bias-adjusted estimates per group given grouping_var
+    df <- as.data.frame(df)
     meta_obj <- metagen(TE = df[, deparse(substitute(es))],
                         seTE = df[, deparse(substitute(se))],
                         subgroup = df[, deparse(substitute(grouping_var))])
     lim_obj <- limitmeta(meta_obj)
   }
 
-
+  # Extract relevant columns
   stopifnot(class(lim_obj) == "limitmeta")
   if (!missing(grouping_var)) {
     df <- data.frame(lim_obj[1], # TE
@@ -84,125 +90,44 @@ esd_table_pba <- function(df = NULL,
     df <- as.data.frame(df)
   }
 
-  if (isTRUE(weighted)) {
-    df$weights <- 1 / df$seTE
-    df$weights.limit <- 1 / df$seTE.limit
-  } else {
-    df$weights <- 1
-    df$weights.limit <- 1
+  results <- list()
+
+  # Use esd_table function to calculate estimates for original and adjusted effect sizes
+  results[["Original"]] <- esd_table(df, TE, seTE,
+                                     weighted = weighted,
+                                     grouping_var = byvar,
+                                     min_group_size = min_group_size,
+                                     method = method,
+                                     ci = ci,
+                                     n_bootstrap = n_bootstrap)
+
+
+  results[["Adjusted"]] <- esd_table(df, TE.limit, seTE.limit,
+                                     weighted = weighted,
+                                     grouping_var = byvar,
+                                     min_group_size = min_group_size,
+                                     method = method,
+                                     ci = ci,
+                                     n_bootstrap = n_bootstrap)
+
+  results <- bind_rows(results, .id = "Estimate")
+
+  results <- as.data.frame(results)
+
+  if (!missing(grouping_var)) {
+    group_levels <- unique(results[["Group"]])
+
+    results <- results |>
+      mutate(
+        Group = factor(Group, levels = group_levels),
+        Estimate = factor(Estimate, levels = c("Original", "Adjusted"))
+      ) |>
+      arrange(Group, Estimate)
   }
-
-  if(missing(grouping_var)) {
-    if(method == "quads") {
-      es_values <- df %>%
-        summarise(cdq25 = round(wtd.quantile(TE_abs, weights = weights, prob = .25, na.rm = TRUE), ndec),
-                  cdq25_adj = round(wtd.quantile(TE.limit_abs, weights = weights.limit, prob = .25, na.rm = TRUE), ndec),
-                  cdq50 = round(wtd.quantile(TE_abs, weights = weights, prob = .50, na.rm = TRUE), ndec),
-                  cdq50_adj = round(wtd.quantile(TE.limit_abs, weights = weights.limit, prob = .5, na.rm = TRUE), ndec),
-                  cdq75 = round(wtd.quantile(TE_abs, weights = weights, prob = .75, na.rm = TRUE), ndec),
-                  cdq75_adj = round(wtd.quantile(TE.limit_abs, weights = weights.limit, prob = .75, na.rm = TRUE), ndec),
-                  count = n())
-    } else if (method == "thirds") {
-      es_values <- df %>%
-        summarise(cdq16 = round(wtd.quantile(TE_abs, weights = weights, prob = .1665, na.rm = TRUE), ndec),
-                  cdq16_adj = round(wtd.quantile(TE.limit_abs, weights = weights.limit, prob = .1665, na.rm = TRUE), ndec),
-                  cdq50 = round(wtd.quantile(TE_abs, weights = weights, prob = .50, na.rm = TRUE), ndec),
-                  cdq50_adj = round(wtd.quantile(TE.limit_abs, weights = weights.limit, prob = .5, na.rm = TRUE), ndec),
-                  cdq83 = round(wtd.quantile(TE_abs, weights = weights, prob = .8335, na.rm = TRUE), ndec),
-                  cdq83_adj = round(wtd.quantile(TE.limit_abs, weights = weights.limit, prob = .8335, na.rm = TRUE), ndec),
-                  count = n())
-    } else {
-      return(warning("Please enter a valid method"))
-    }
-    es_values <- as.data.frame(es_values)
-    adj_values <- data.frame(matrix("", nrow = 2, ncol = 4))
-    rownames(adj_values) <- c("Raw effect size", "Adjusted effect size")
-
-    for (i in 1:2) {
-      for (j in 1:3) {
-        index <- (i-1+(j*2-1))
-        adj_values[i,j] <- format(round(as.numeric(es_values[index]), 2), nsmall = 2)
-      }
-      adj_values[i,4] <-as.numeric(es_values[7])
-    }
-
-  } else {
-    if (method == "quads") {
-      es_values <- df %>%
-        # mutate({{ grouping_var }} := as.character({{ grouping_var }})) %>%
-        # bind_rows(mutate(., {{grouping_var}} := "All")) %>%
-        group_by(byvar) %>%
-        summarise(cdq25 = round(wtd.quantile(TE_abs, weights = weights, prob = .25, na.rm = TRUE), ndec),
-                  cdq25_adj = round(wtd.quantile(TE.limit_abs, weights = weights.limit, prob = .25, na.rm = TRUE), ndec),
-                  cdq50 = round(wtd.quantile(TE_abs, weights = weights, prob = .50, na.rm = TRUE), ndec),
-                  cdq50_adj = round(wtd.quantile(TE.limit_abs, weights = weights.limit, prob = .5, na.rm = TRUE), ndec),
-                  cdq75 = round(wtd.quantile(TE_abs, weights = weights, prob = .75, na.rm = TRUE), ndec),
-                  cdq75_adj = round(wtd.quantile(TE.limit_abs, weights = weights.limit, prob = .75, na.rm = TRUE), ndec),
-                  count = n()) %>%
-        ungroup() %>%
-        bind_rows(df %>% summarise(byvar := "All",
-                                   cdq25 = round(wtd.quantile(TE_abs, weights = weights, prob = .25, na.rm = TRUE), ndec),
-                                   cdq25_adj = round(wtd.quantile(TE.limit_abs, weights = weights.limit, prob = .25, na.rm = TRUE), ndec),
-                                   cdq50 = round(wtd.quantile(TE_abs, weights = weights, prob = .50, na.rm = TRUE), ndec),
-                                   cdq50_adj = round(wtd.quantile(TE.limit_abs, weights = weights.limit, prob = .5, na.rm = TRUE), ndec),
-                                   cdq75 = round(wtd.quantile(TE_abs, weights = weights, prob = .75, na.rm = TRUE), ndec),
-                                   cdq75_adj = round(wtd.quantile(TE.limit_abs, weights = weights.limit, prob = .75, na.rm = TRUE), ndec),
-                                   count = n()))
-    } else if (method == "thirds") {
-      es_values <- df %>%
-        # mutate({{grouping_var}} := as.character({{grouping_var}})) %>%
-        # bind_rows(mutate(., {{grouping_var}} := "All")) %>%
-        group_by(byvar) %>%
-        summarise(cdq16 = round(wtd.quantile(TE_abs, weights = weights, prob = .1665, na.rm = TRUE), ndec),
-                  cdq16_adj = round(wtd.quantile(TE.limit_abs, weights = weights.limit, prob = .1665, na.rm = TRUE), ndec),
-                  cdq50 = round(wtd.quantile(TE_abs, weights = weights, prob = .50, na.rm = TRUE), ndec),
-                  cdq50_adj = round(wtd.quantile(TE.limit_abs, weights = weights.limit, prob = .5, na.rm = TRUE), ndec),
-                  cdq83 = round(wtd.quantile(TE_abs, weights = weights, prob = .8335, na.rm = TRUE), ndec),
-                  cdq83_adj = round(wtd.quantile(TE.limit_abs, weights = weights.limit, prob = .8335, na.rm = TRUE), ndec),
-                  count = n()) %>%
-        ungroup() %>%
-        bind_rows(df %>% summarise(byvar := "All",
-                                   cdq16 = round(wtd.quantile(TE_abs, weights = weights, prob = .1665, na.rm = TRUE), ndec),
-                                   cdq16_adj = round(wtd.quantile(TE.limit_abs, weights = weights.limit, prob = .1665, na.rm = TRUE), ndec),
-                                   cdq50 = round(wtd.quantile(TE_abs, weights = weights, prob = .50, na.rm = TRUE), ndec),
-                                   cdq50_adj = round(wtd.quantile(TE.limit_abs, weights = weights.limit, prob = .5, na.rm = TRUE), ndec),
-                                   cdq83 = round(wtd.quantile(TE_abs, weights = weights, prob = .8335, na.rm = TRUE), ndec),
-                                   cdq83_adj = round(wtd.quantile(TE.limit_abs, weights = weights.limit, prob = .8335, na.rm = TRUE), ndec),
-                                   count = n()))
-
-    } else {
-      return("Please enter a valid method")
-    }
-
-    es_values <- es_values %>%
-      filter(count >= min_group_size)
-    es_values <- as.data.frame(es_values)
-    adj_values <- data.frame(matrix(nrow = (2 * nrow(es_values)), ncol = 4))
-    adj_table_rownames <- c()
-
-    # Place each adjusted row after each raw effect size row.
-    for (h in 1:nrow(es_values)) {
-      adj_table_rownames[h*2-1] <- as.character(es_values[h,1])
-      adj_table_rownames[h*2] <- as.character(paste(es_values[h,1], "adjusted", sep = " "))
-      for (i in 1:2) {
-        row_index <- i-1+(h*2-1)
-        for (j in 1:3) {
-          col_index <- (i+(j*2)-1)
-          adj_values[row_index,j] <- format(round(as.numeric(es_values[h,col_index]), 2), nsmall = 2)
-        }
-        adj_values[row_index,4] <- es_values[h,8]
-      }
-    }
-    rownames(adj_values) <- adj_table_rownames
-
-  }
-  ifelse(method == "thirds",
-         colnames(adj_values) <- c("16.65%", "50%", "83.35%", "Number of effects"),
-         colnames(adj_values) <- c("25%", "50%", "75%", "Number of effects"))
 
 
   if (csv_write == TRUE) {
     write.csv(adj_values, file = path_file_name)
   }
-  return(adj_values)
+  return(results)
 }

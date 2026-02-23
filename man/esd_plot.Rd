@@ -2,60 +2,62 @@
 % Please edit documentation in R/esd_plot.R
 \name{esd_plot}
 \alias{esd_plot}
-\title{Creating a plot for an effect size distribution}
+\title{Plotting effect size distributions.}
 \usage{
 esd_plot(
   df,
   es,
-  es_type,
   se = NULL,
+  es_type = "Effect size",
+  grouping_var = NULL,
+  min_group_size = 20,
   weighted = FALSE,
-  method = FALSE,
-  mean = NULL,
+  method = NULL,
+  ci = FALSE,
   sesoi = NULL,
-  abs = FALSE,
-  bin_width = 0.1
+  bin_width = 0.1,
+  n_bootstrap = 1000
 )
 }
 \arguments{
-\item{df}{Dataset.}
+\item{df}{A dataframe.}
 
-\item{es}{Column name of effect sizes.}
+\item{es}{The effect size column.}
 
-\item{es_type}{A string describing the type of effect size used (e.g.,
-"Cohen's d").}
+\item{se}{The standard error column (defaults to NULL).}
 
-\item{se}{Column name of stanard error.}
+\item{es_type}{A string specifying the type of effect size (for x-axis
+label).}
 
-\item{weighted}{Defaults to FALSE. When set to TRUE, will calculate the
-weighted distribution based on the inverse standard error.}
+\item{grouping_var}{Column name of grouping variable.}
 
-\item{method}{Defaults to FALSE, can also be 'thirds' for 16.65th, 50th, and
-83.35th percentiles, or 'quads' for 25th, 50th, and 75th percentiles.}
+\item{min_group_size}{Sets the minimum amount of effect sizes in each group
+as specified by the \code{grouping_var} variable. Defaults to 20.}
 
-\item{mean}{Defaults to NULL, but will insert a ggplot geom_vline element
-that corresponds to the mean effect size if set to 'mean' or takes on
-a numeric argument to generate a geom_vline element that corresponds to
-the inputted value.}
+\item{weighted}{Defaults to FALSE. If set to TRUE, will weight all effect
+sizes by their standard error (requires \code{se} to be defined).}
 
-\item{sesoi}{A numeric argument that corresponds to the population ES of
-interest. This will split the histogram into two parts around the inputted
-value.}
+\item{method}{Defaults to NULL. Can be set to "quads" (.25, .5, .75) or
+"thirds" (.1665, .5, .8335) to plot vertical lines based on the respective
+benchmarks.}
 
-\item{abs}{Defaults to FALSE. If set to TRUE, plots all effect sizes as
-absolute values.}
+\item{ci}{Defaults to FALSE. If set to TRUE, will plot 95\% CIs for each
+benchmark (requires \code{method} to be defined).}
 
-\item{bin_width}{Numeric argument that corresponds to the bin width for the
-histogram. Defaults to 0.1.}
+\item{sesoi}{Defaults to NULL. When given a value, will calculate the
+percentage of (weighted) effect sizes larger (or equal to) this value.}
+
+\item{bin_width}{Width of the histogram bins. Defaults to 0.1.}
+
+\item{n_bootstrap}{Number of bootstrapped samples for benchmark 95\% CIs.}
 }
 \value{
-A ggplot object.
+A 'ggplot' object.
 }
 \description{
-Creating a plot for an effect size distribution
+Plotting effect size distributions.
 }
 \examples{
-esd_plot(df = ot_dat,
-                   es = yi,
-                   es_type = "Cohen's d")
+esd_plot(ot_dat, yi)
+esd_plot(ot_dat, yi, grouping_var = group)
 }

@@ -2,43 +2,46 @@
 % Please edit documentation in R/esd_table.R
 \name{esd_table}
 \alias{esd_table}
-\title{Creating a table for field-specific effect size benchmarks}
+\title{Create a table of effect size benchmarks.}
 \usage{
 esd_table(
   df,
   es,
   se = NULL,
-  weighted = FALSE,
   grouping_var = NULL,
+  min_group_size = 3,
+  weighted = FALSE,
   method = "quads",
   ci = FALSE,
-  min_group_size = 3,
+  n_bootstrap = 1000,
   csv_write = FALSE,
   path_file_name = "esd_table.csv",
   ndec = 2
 )
 }
 \arguments{
-\item{df}{Dataset.}
+\item{df}{A dataframe.}
 
-\item{es}{Column name of effect sizes.}
+\item{es}{The effect size column.}
 
-\item{se}{Column name of standard error.}
-
-\item{weighted}{Defaults to FALSE. When set to TRUE, will calculate the
-weighted distribution based on the inverse standard error.}
+\item{se}{The standard error column (defaults to NULL).}
 
 \item{grouping_var}{Column name of grouping variable.}
 
-\item{method}{Defaults to 'quads', calculating the 25\%, 50\%, and 75\%
-percentiles. Can also be 'thirds', calculating the 16.65\%, 50\%, and 83.35\%
-percentiles.}
+\item{min_group_size}{Sets the minimum amount of effect sizes in each group
+as specified by the \code{grouping_var} variable. Defaults to 20.}
 
-\item{ci}{Defaults to "FALSE". When set to TRUE, will calculate bootstrapped
-estimates of each percentile, along with their 95\% CI.}
+\item{weighted}{Defaults to FALSE. If set to TRUE, will weight all effect
+sizes by their standard error (requires \code{se} to be defined).}
 
-\item{min_group_size}{Sets the minimum amount of effect sizes needed to
-include a group in the table. Defaults to 3.}
+\item{method}{Defaults to "quads". Can be set to "quads" (.25, .5, .75) or
+"thirds" (.1665, .5, .8335) to plot vertical lines based on the respective
+benchmarks.}
+
+\item{ci}{Defaults to FALSE. If set to TRUE, will plot 95\% CIs for each
+benchmark (requires \code{method} to be defined).}
+
+\item{n_bootstrap}{Number of bootstrapped samples for benchmark 95\% CIs.}
 
 \item{csv_write}{Defaults to FALSE. Will write the outputted table as a csv.}
 
@@ -46,17 +49,15 @@ include a group in the table. Defaults to 3.}
 file will be saved, including the title of the .csv file (has to end in
 '.csv').}
 
-\item{ndec}{The number of decimal places in which all values should be
-reported. Defaults to 2.}
+\item{ndec}{Number of decimals. Defaults to 2.}
 }
 \value{
-A table.
+A table of class 'data.frame'.
 }
 \description{
-Creating a table for field-specific effect size benchmarks
+Create a table of effect size benchmarks.
 }
 \examples{
-esd_table(ot_dat, yi, grouping_var = group, method = "thirds")
-
-
+esd_table(ot_dat, yi)
+esd_table(ot_dat, yi, grouping_var = group)
 }

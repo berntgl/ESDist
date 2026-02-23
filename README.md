@@ -4,6 +4,7 @@
 # ESDist: Calculate and visualise field-specific ESDs
 
 <!-- badges: start -->
+
 <!-- badges: end -->
 
 ## Description
@@ -141,31 +142,18 @@ plot4 <- esd_plot_pba(df = ot_dat,
                   se = sei,
                   es_type = "Hedges' g",
                   sesoi = 0.3)
+#> Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
+#> ℹ Please use `linewidth` instead.
+#> ℹ The deprecated feature was likely used in the ESDist package.
+#>   Please report the issue to the authors.
+#> This warning is displayed once per session.
+#> Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
+#> generated.
 
 plot4
 ```
 
 ![](man/figures/README-unnamed-chunk-9-1.png)<!-- -->
-
-## esd_plot_group()
-
-### Simple plot per group
-
-The `esd_plot_group()` function allows for specifying a `grouping_var`
-to group data and create plots for each group with 20 or more effect
-sizes. It otherwise takes the same arguments as the standard
-`esd_plot()` function (with the exception of the `sesoi` argument).
-
-``` r
-plot5 <- esd_plot_group(df = ot_dat,
-                        es = yi,
-                        es_type = "Hedges' g",
-                        grouping_var = group)
-
-plot5
-```
-
-![](man/figures/README-unnamed-chunk-10-1.png)<!-- -->
 
 ## esd_plot_pba()
 
@@ -187,7 +175,7 @@ plot6 <- esd_plot_pba(df = ot_dat,
 plot6
 ```
 
-![](man/figures/README-unnamed-chunk-11-1.png)<!-- -->
+![](man/figures/README-unnamed-chunk-10-1.png)<!-- -->
 
 ## esd_table()
 
@@ -208,8 +196,8 @@ table1 <- esd_table(df = ot_dat,
                     es = yi)
 
 table1
-#>                  25%  50% 75% Number of effects
-#> Raw effect size 0.06 0.24 0.5               182
+#>     25%  50%  75%   n
+#> 1 -0.03 0.12 0.43 182
 ```
 
 ### Calculate effect size benchmarks per group
@@ -225,16 +213,16 @@ table2 <- esd_table(df = ot_dat,
                     grouping_var = group)
 
 table2
-#>          Group  25%  50%  75% Number of effects
-#> 1           AN 0.02 0.05 0.06                 6
-#> 2          ASD 0.11 0.31 0.55                32
-#> 3          BPD 0.16 1.22 2.29                 5
-#> 4         PTSD 0.20 0.32 0.38                 6
-#> 5          SCZ 0.05 0.13 0.24                20
-#> 6      anxiety 0.19 0.31 0.41                 4
-#> 7   depression 0.21 0.45 0.91                 6
-#> 8 neurotypical 0.05 0.25 0.66                89
-#> 9          All 0.06 0.24 0.50               182
+#>          Group   25%   50%   75%   n
+#> 1           AN -0.06 -0.03  0.01   6
+#> 2      anxiety  0.00  0.17  0.27   4
+#> 3          ASD  0.01  0.27  0.53  32
+#> 4          BPD -2.29 -0.16 -0.02   5
+#> 5   depression  0.21  0.45  0.91   6
+#> 6 neurotypical -0.02  0.07  0.45  89
+#> 7         PTSD  0.20  0.32  0.38   6
+#> 8          SCZ -0.04  0.04  0.20  20
+#> 9          All -0.03  0.12  0.43 182
 ```
 
 ### Calculate effect size benchmarks from a weighted distribution
@@ -251,8 +239,8 @@ table3 <- esd_table(df = ot_dat,
                     weighted = TRUE)
 
 table3
-#>                  25% 50%  75% Number of effects
-#> Raw effect size 0.05 0.2 0.43               182
+#>     25%  50% 75%   n
+#> 1 -0.05 0.03 0.3 182
 ```
 
 ## esd_table_pba()
@@ -268,9 +256,9 @@ table4 <- esd_table_pba(df = ot_dat,
                         se = sei)
 
 table4
-#>                       25%  50%  75% Number of effects
-#> Raw effect size      0.06 0.24 0.50               182
-#> Adjusted effect size 0.08 0.20 0.39               182
+#>   Estimate   25%  50%  75%   n
+#> 1 Original -0.03 0.12 0.43 182
+#> 2 Adjusted -0.09 0.04 0.31 182
 ```
 
 ### Editing and saving tables
@@ -287,8 +275,7 @@ can be saved to a specific location with a specific name.
 ### Calculating the percentile of a value
 
 Using `esd_perc()`, you can calculate to which percentile of the ESD a
-given value corresponds. Note that absolute effect size values should be
-used.
+given value corresponds.
 
 ``` r
 library(ESDist)
