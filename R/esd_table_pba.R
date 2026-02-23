@@ -122,7 +122,8 @@ esd_table_pba <- function(df = NULL,
         Group = factor(Group, levels = group_levels),
         Estimate = factor(Estimate, levels = c("Original", "Adjusted"))
       ) |>
-      arrange(Group, Estimate)
+      arrange(Group, Estimate) |>
+      relocate(Group)
   }
 
 
