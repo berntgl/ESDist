@@ -14,6 +14,7 @@ esd_table(
   method = "quads",
   ci = FALSE,
   n_bootstrap = 1000,
+  bowley = FALSE,
   csv_write = FALSE,
   path_file_name = "esd_table.csv",
   ndec = 2

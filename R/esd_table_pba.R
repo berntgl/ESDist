@@ -15,6 +15,8 @@
 #' @param ci Defaults to FALSE. If set to TRUE, will plot 95% CIs for each
 #' benchmark (requires `method` to be defined).
 #' @param n_bootstrap Number of bootstrapped samples for benchmark 95% CIs.
+#' @param bowley Defaults to FALSE. Will calculate Bowley's skewness when set
+#' to TRUE.
 #' @param csv_write Defaults to FALSE. Will write the outputted table as a csv.
 #' @param path_file_name A string containing the directory to which the .csv
 #' file will be saved, including the title of the .csv file (has to end in

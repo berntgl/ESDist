@@ -4,6 +4,7 @@
 ## usethis namespace: start
 #' @import dplyr
 #' @import ggplot2
+#' @importFrom boot boot
 #' @importFrom Hmisc wtd.quantile
 #' @importFrom meta metagen
 #' @importFrom metasens limitmeta
