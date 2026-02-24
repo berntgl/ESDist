@@ -42,7 +42,7 @@ basic_plot <- function(df,
   if (!is.null(grouping_var)) {
     df <- df |>
       group_by(.data[[grouping_var]]) |>
-      filter(n() >= 20) |>
+      filter(n() >= min_group_size) |>
       ungroup()
   }
 
