@@ -44,6 +44,9 @@ benchmark (requires \code{method} to be defined).}
 
 \item{n_bootstrap}{Number of bootstrapped samples for benchmark 95\% CIs.}
 
+\item{bowley}{Defaults to FALSE. Will calculate Bowley's skewness when set
+to TRUE.}
+
 \item{csv_write}{Defaults to FALSE. Will write the outputted table as a csv.}
 
 \item{path_file_name}{A string containing the directory to which the .csv
