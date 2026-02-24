@@ -34,18 +34,24 @@ esd_table <- function(df,
                       method = "quads",
                       ci = FALSE,
                       n_bootstrap = 1000,
+                      bowley = FALSE,
                       csv_write = FALSE,
                       path_file_name = "esd_table.csv",
                       ndec = 2) {
-
-  #print(quo_name(grouping_var))
 
   # Define the probs based on the specified method
   if (method == "quads") {
     probs <- c(0.25, 0.5, 0.75)
   } else if (method == "thirds") {
     probs <- c(0.1665, 0.5, 0.8335)
+    if (bowley) {
+      bowley <- FALSE
+      warning("Can't calculate Bowley's coefficient for method 'thirds'.")
+    }
+  } else {
+    stop(paste("No valid method specified: ", method, ". \n Method has to be 'quads' or 'thirds'."))
   }
+
 
   # Condition on a grouping var being specified
   if (!is.null(df[[deparse(substitute(grouping_var))]])) {
@@ -69,13 +75,17 @@ esd_table <- function(df,
                                                        se = deparse(substitute(se)),
                                                        probs = probs,
                                                        weighted = weighted,
-                                                       n_bootstrap = n_bootstrap)
+                                                       bowley = bowley,
+                                                       n_bootstrap = n_bootstrap,
+                                                       ndec = ndec)
         } else {
           results[[group]] <- calculate_percentiles(df = group_df,
                                                     es = deparse(substitute(es)),
                                                     se = deparse(substitute(se)),
                                                     probs = probs,
-                                                    weighted = weighted)
+                                                    weighted = weighted,
+                                                    bowley = bowley,
+                                                    ndec = ndec)
         }
       }
     }
@@ -88,7 +98,9 @@ esd_table <- function(df,
                                                    se = deparse(substitute(se)),
                                                    probs = probs,
                                                    weighted = weighted,
-                                                   n_bootstrap = n_bootstrap)
+                                                   bowley = bowley,
+                                                   n_bootstrap = n_bootstrap,
+                                                   ndec = ndec)
       # Combine results in a dataframe
       results <- bind_rows(results, .id = "Group")
 
@@ -97,7 +109,9 @@ esd_table <- function(df,
                                                 es = deparse(substitute(es)),
                                                 se = deparse(substitute(se)),
                                                 probs = probs,
-                                                weighted = weighted)
+                                                weighted = weighted,
+                                                bowley = bowley,
+                                                ndec = ndec)
 
       # Combine results in a dataframe
       results <- bind_rows(results, .id = "Group")
@@ -112,7 +126,9 @@ esd_table <- function(df,
                                           se = deparse(substitute(se)),
                                           probs = probs,
                                           weighted = weighted,
-                                          n_bootstrap = n_bootstrap)
+                                          bowley = bowley,
+                                          n_bootstrap = n_bootstrap,
+                                          ndec = ndec)
 
 
 
@@ -121,7 +137,9 @@ esd_table <- function(df,
                                        es = deparse(substitute(es)),
                                        se = deparse(substitute(se)),
                                        probs = probs,
-                                       weighted = weighted)
+                                       weighted = weighted,
+                                       bowley = bowley,
+                                       ndec = ndec)
     }
 
   }

@@ -16,7 +16,9 @@ calculate_percentiles_ci <- function(df,
                                      se,
                                      probs,
                                      weighted,
-                                     n_bootstrap) {
+                                     bowley,
+                                     n_bootstrap,
+                                     ndec = 2) {
   # Extract the effect sizes
   # Attempt to access the specified column
   es_col <- df[[es]]
@@ -46,14 +48,14 @@ calculate_percentiles_ci <- function(df,
                   R = n_bootstrap)
 
   # Calculate the bootstrapped percentiles
-  percentiles_estimates <- round(apply(results$t, 2, quantile, probs = c(0.025, 0.5, 0.975)), 2)
+  percentiles_estimates <- round(apply(results$t, 2, quantile, probs = c(0.025, 0.5, 0.975)), ndec)
 
   # Calculate mean of the bootstrapped quantiles
-  boot_mean_estimates <- round(colMeans(results$t), 2)
+  boot_mean_estimates <- round(colMeans(results$t), ndec)
 
   # Get original percentiles
   original_percentiles <- round(wtd.quantile(es_col, probs = probs,
-                                           weights = weights, na.rm = TRUE), 2)
+                                           weights = weights, na.rm = TRUE), ndec)
 
   # Create results table with dynamic column names
   results_table <- c()
@@ -69,12 +71,25 @@ calculate_percentiles_ci <- function(df,
     #boot_mean_name <- paste0(as.integer(probs[i] * 100), "_Boot_Mean")
     #results_table[boot_mean_name] <- boot_mean_estimates[i]
 
-    results_table[paste0(as.integer(probs[i] * 100), "% CI Lower")] <- percentiles_estimates[1, i]
+    results_table[paste0(as.integer(probs[i] * 100), "% CIL")] <- percentiles_estimates[1, i]
     #results_table[paste0(as.integer(probs[i] * 100), "_CI_Median")] <- percentiles_estimates[2, i]
-    results_table[paste0(as.integer(probs[i] * 100), "% CI Upper")] <- percentiles_estimates[3, i]
+    results_table[paste0(as.integer(probs[i] * 100), "% CIU")] <- percentiles_estimates[3, i]
   }
   results_table <- as.data.frame(t(results_table))
   results_table$n <- as.integer(length(es_col))
+  if (bowley) {
+    Q1 <- original_percentiles[probs == 0.25]
+    Q2 <- original_percentiles[probs == 0.50]
+    Q3 <- original_percentiles[probs == 0.75]
+
+    denom <- (Q3 - Q1)
+    if (denom == 0) {
+      results_table$Bowley <- NA_real_
+      warning("Cannot compute Bowley's skewness: Q3 equals Q1 (denominator is zero).")
+    } else {
+      results_table$Bowley <- round((Q3 + Q1 - 2 * Q2) / denom, ndec)
+    }
+  }
   return(results_table)
 }
 
@@ -90,7 +105,13 @@ calculate_percentiles_ci <- function(df,
 #' @returns A table.
 #' @noRd
 
-calculate_percentiles <- function(df, es, se = NULL, weighted = FALSE, probs) {
+calculate_percentiles <- function(df,
+                                  es,
+                                  se = NULL,
+                                  weighted = FALSE,
+                                  probs,
+                                  bowley,
+                                  ndec = 2) {
 
   es_col <- df[[es]]
 
@@ -106,7 +127,7 @@ calculate_percentiles <- function(df, es, se = NULL, weighted = FALSE, probs) {
 
   # Calculate the percentiles, round to no. specified decimals
   percentiles <- round(wtd.quantile(es_col, probs = probs,
-                                    weights = weights, na.rm = TRUE), 2)
+                                    weights = weights, na.rm = TRUE), ndec)
 
   # Turn into dataframe with each percentile as a column
   percentiles <- as.data.frame(t(percentiles))
@@ -114,5 +135,18 @@ calculate_percentiles <- function(df, es, se = NULL, weighted = FALSE, probs) {
   # Add no. of observations
   percentiles$n <- as.integer(length(es_col))
 
+  if (bowley) {
+    Q1 <- unname(percentiles[[1]])
+    Q2 <- unname(percentiles[[2]])
+    Q3 <- unname(percentiles[[3]])
+
+    denom <- (Q3 - Q1)
+    if (denom == 0) {
+      percentiles$Bowley <- NA_real_
+      warning("Cannot compute Bowley's skewness: Q3 equals Q1 (denominator is zero).")
+    } else {
+      percentiles$Bowley <- round((Q3 + Q1 - 2 * Q2) / denom, ndec)
+    }
+  }
   return(percentiles)
 }

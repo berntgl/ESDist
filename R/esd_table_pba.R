@@ -36,6 +36,7 @@ esd_table_pba <- function(df = NULL,
                           method = "quads",
                           ci = FALSE,
                           n_bootstrap = 1000,
+                          bowley = FALSE,
                           csv_write = FALSE,
                           path_file_name = "esd_table.csv",
                           ndec = 2) {
@@ -99,7 +100,9 @@ esd_table_pba <- function(df = NULL,
                                      min_group_size = min_group_size,
                                      method = method,
                                      ci = ci,
-                                     n_bootstrap = n_bootstrap)
+                                     n_bootstrap = n_bootstrap,
+                                     bowley = bowley,
+                                     ndec = ndec)
 
 
   results[["Adjusted"]] <- esd_table(df, TE.limit, seTE.limit,
@@ -108,7 +111,9 @@ esd_table_pba <- function(df = NULL,
                                      min_group_size = min_group_size,
                                      method = method,
                                      ci = ci,
-                                     n_bootstrap = n_bootstrap)
+                                     n_bootstrap = n_bootstrap,
+                                     bowley = bowley,
+                                     ndec = ndec)
 
   results <- bind_rows(results, .id = "Estimate")
 
