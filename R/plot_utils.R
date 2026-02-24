@@ -404,7 +404,7 @@ add_benchmarks <- function(plot,
     } else {
       annotation <- df |>
         group_by(.data[[grouping_var]]) |>
-        filter(n() >= 20) |>
+        filter(n() >= min_group_size) |>
         group_modify(~ make_annotation_ci(.x)) |>
         ungroup()
       names(annotation)[1] <- grouping_var
