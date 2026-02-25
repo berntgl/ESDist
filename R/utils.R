@@ -18,17 +18,24 @@ calculate_percentiles_ci <- function(df,
                                      es,
                                      se,
                                      probs,
-                                     weighted,
-                                     bowley,
-                                     n_bootstrap,
+                                     weighted = FALSE,
+                                     abs = FALSE,
+                                     bowley = FALSE,
+                                     n_bootstrap = 1000,
                                      ndec = 2) {
   # Extract the effect sizes
   # Attempt to access the specified column
-  es_col <- df[[es]]
-  se_col <- df[[se]]
+  if (abs) {
+    es_col <- abs(df[[es]])
+    df[[es]] <- abs(df[[es]])
+  } else {
+    es_col <- df[[es]]
+  }
+
 
   if (weighted) {
     stopifnot(!missing(se))
+    se_col <- df[[se]]
     weights <- 1 / (se_col^2)
   } else {
     weights <- rep(1, length(es_col))
@@ -116,10 +123,17 @@ calculate_percentiles <- function(df,
                                   se = NULL,
                                   weighted = FALSE,
                                   probs,
-                                  bowley,
+                                  abs = FALSE,
+                                  bowley = FALSE,
                                   ndec = 2) {
 
-  es_col <- df[[es]]
+  if (abs) {
+    es_col <- abs(df[[es]])
+    df[[es]] <- abs(df[[es]])
+  } else {
+    es_col <- df[[es]]
+  }
+
 
   if (weighted) {
     stopifnot(!missing(se))

@@ -25,6 +25,7 @@ basic_plot <- function(df,
                        min_group_size = 20,
                        weighted = FALSE,
                        sesoi = NULL,
+                       abs = FALSE,
                        bin_width = 0.1) {
 
   # Colour palette
@@ -46,7 +47,13 @@ basic_plot <- function(df,
       ungroup()
   }
 
-  es_col <- df[[es]]
+  if (abs) {
+    es_col <- abs(df[[es]])
+    df[[es]] <- abs(df[[es]])
+  } else {
+    es_col <- df[[es]]
+  }
+
 
 
   # Calculate weights
@@ -98,11 +105,11 @@ basic_plot <- function(df,
       guides(fill = guide_legend(position = "inside")) +
       theme(legend.position.inside = c(0.9, 0.7),
             legend.background = element_rect(fill=primary_lightest, color = primary_lightest),
-            legend.title = element_text(size=14),
-            legend.text = element_text(size=12),
+            legend.title = element_text(size=12),
+            legend.text = element_text(size=10),
             legend.key.size = unit(1, 'cm'),
-            axis.text = element_text(size=12),
-            axis.title = element_text(size=20))
+            axis.text = element_text(size=10),
+            axis.title = element_text(size=16))
   }
   if (!is.null(grouping_var)) {
     plot <- plot +
@@ -144,6 +151,7 @@ iceberg_plot <- function(df,
                          es_type = "Effect size",
                          weighted  = FALSE,
                          sesoi = NULL,
+                         abs = FALSE,
                          bin_width = 0.1) {
   # Colour palette
   primary_darkest <- "#00161E"
@@ -155,23 +163,32 @@ iceberg_plot <- function(df,
   secondary_light <- "#E7E7E7"
   accent <- "#D5A42C"
 
-  es_rand_col   <- df[[es_random]]
-  es_adj_col    <- df[[es_adjust]]
+  if (abs) {
+    es_rand_col <- abs(df[[es_random]])
+    es_adj_col <- abs(df[[es_adjust]])
+    df[[es_random]] <- abs(df[[es_random]])
+    df[[es_adjust]] <- abs(df[[es_adjust]])
+
+  } else {
+    es_rand_col <- df[[es_random]]
+    es_adj_col <- df[[es_adjust]]
+  }
+
 
   # If weighted: compute weights from SE; otherwise set to 1
   if (weighted) {
     stopifnot(!is.null(se_random), !is.null(se_adjust))
 
     se_rand_col <- df[[se_random]]
-    se_adj_col  <- df[[se_adjust]]
+    se_adj_col <- df[[se_adjust]]
 
-    df$weights        <- 1 / (se_rand_col^2)
-    df$weights.limit  <- 1 / (se_adj_col^2)
+    df$weights <- 1 / (se_rand_col^2)
+    df$weights.limit <- 1 / (se_adj_col^2)
 
     y_label <- "Weighted count"
   } else {
-    df$weights        <- 1
-    df$weights.limit  <- 1
+    df$weights <- 1
+    df$weights.limit <- 1
     y_label <- "Count"
   }
 
@@ -193,8 +210,8 @@ iceberg_plot <- function(df,
       geom_hline(aes(yintercept = 0), size = 0.2) +
       labs(x = es_type, y = y_label) +
       scale_y_continuous(labels = function(x) abs(x)) +
-      theme(axis.text  = element_text(size = 12),
-            axis.title = element_text(size = 20))
+      theme(axis.text  = element_text(size = 10),
+            axis.title = element_text(size = 16))
 
     return(plot)
   }
@@ -259,11 +276,11 @@ iceberg_plot <- function(df,
     labs(x = es_type, y = y_label) +
     theme(
       legend.position = "bottom",
-      legend.title = element_text(size = 14, hjust = 0.5),
-      legend.text = element_text(size = 12),
+      legend.title = element_text(size = 12, hjust = 0.5),
+      legend.text = element_text(size = 10),
       legend.key.size = unit(1, "cm"),
-      axis.text = element_text(size = 12),
-      axis.title = element_text(size = 20)
+      axis.text = element_text(size = 10),
+      axis.title = element_text(size = 16)
     ) +
     scale_y_continuous(labels = function(x) abs(x))
 
@@ -301,6 +318,7 @@ add_benchmarks <- function(plot,
                            min_group_size = 20,
                            weighted = FALSE,
                            method,
+                           abs = FALSE,
                            ci = FALSE,
                            n_bootstrap = 1000,
                            mirrored = FALSE) {
@@ -335,12 +353,13 @@ add_benchmarks <- function(plot,
                                    se = se,
                                    weighted = weighted,
                                    probs = probs,
+                                   abs = abs,
                                    n_bootstrap = n_bootstrap)
 
     data.frame(
-      q     = c(as.numeric(unname(qt[1])),
-                as.numeric(unname(qt[4])),
-                as.numeric(unname(qt[7]))),
+      q = c(as.numeric(unname(qt[1])),
+            as.numeric(unname(qt[4])),
+            as.numeric(unname(qt[7]))),
       lower = c(as.numeric(unname(qt[2])),
                 as.numeric(unname(qt[5])),
                 as.numeric(unname(qt[8]))),
@@ -355,13 +374,14 @@ add_benchmarks <- function(plot,
     qt <- calculate_percentiles(df = d,
                                 es = es,
                                 se = se,
+                                abs = abs,
                                 weighted = weighted,
                                 probs = probs)
 
     data.frame(
-      q     = c(as.numeric(unname(qt[1])),
-                as.numeric(unname(qt[2])),
-                as.numeric(unname(qt[3]))),
+      q = c(as.numeric(unname(qt[1])),
+            as.numeric(unname(qt[2])),
+            as.numeric(unname(qt[3]))),
       label = labels
     )
   }
@@ -378,7 +398,7 @@ add_benchmarks <- function(plot,
                   fill = benchmarks1,
                   color = NA,
                   alpha = 0.3,
-                  size = 1)
+                  linewidth = 1)
     } else {
       annotation <- make_annotation_no_ci(df)
     }
@@ -400,7 +420,7 @@ add_benchmarks <- function(plot,
                   fill = benchmarks1,
                   color = NA,
                   alpha = 0.3,
-                  size = 1)
+                  linewidth = 1)
     } else {
       annotation <- df |>
         group_by(.data[[grouping_var]]) |>

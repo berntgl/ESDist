@@ -39,6 +39,7 @@ esd_plot_pba <- function(df = NULL,
                          sesoi = NULL,
                          sum_es = TRUE,
                          method = NULL,
+                         abs = FALSE,
                          ci = FALSE,
                          sum_es_type = "diamond",
                          bin_width = 0.1,
@@ -68,8 +69,10 @@ esd_plot_pba <- function(df = NULL,
 
   plot <- iceberg_plot(df = df,
                        weighted = weighted,
+                       es_type = es_type,
                        sesoi = sesoi,
-                       bin_width = bin_width)
+                       bin_width = bin_width,
+                       abs = abs)
 
   if (!missing(method)) {
     # Random
@@ -79,6 +82,7 @@ esd_plot_pba <- function(df = NULL,
                            se = "seTE",
                            weighted = weighted,
                            method = method,
+                           abs = abs,
                            ci = ci,
                            n_bootstrap = n_bootstrap)
 
@@ -90,6 +94,7 @@ esd_plot_pba <- function(df = NULL,
                              se = "seTE.limit",
                              weighted = weighted,
                              method = method,
+                             abs = abs,
                              ci = ci,
                              n_bootstrap = n_bootstrap,
                              mirrored = TRUE)

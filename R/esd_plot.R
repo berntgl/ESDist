@@ -34,6 +34,7 @@ esd_plot <- function(df,
                      min_group_size = 20,
                      weighted = FALSE,
                      method = NULL,
+                     abs = FALSE,
                      ci = FALSE,
                      sesoi = NULL,
                      bin_width = 0.1,
@@ -54,10 +55,12 @@ esd_plot <- function(df,
   plot <- basic_plot(df = df,
                      es = es,
                      se = se,
+                     es_type = es_type,
                      grouping_var = grouping_var,
                      min_group_size = min_group_size,
                      weighted = weighted,
                      sesoi = sesoi,
+                     abs = abs,
                      bin_width = bin_width)
 
 
@@ -71,6 +74,7 @@ esd_plot <- function(df,
                            min_group_size = min_group_size,
                            weighted = weighted,
                            method = method,
+                           abs = abs,
                            ci = ci,
                            n_bootstrap = n_bootstrap)
   }

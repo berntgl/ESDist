@@ -45,7 +45,7 @@ ot_dat$sei[ot_dat$es_type != "Hedges' g"] <- sqrt((ot_dat$raw_se[ot_dat$es_type 
 
 ot_dat$yi <- round(ot_dat$yi, digits = 3)
 ot_dat$sei <- round(ot_dat$sei, digits = 3)
-
+ot_dat$yi_abs <- abs(ot_dat$yi)
 
 # Filter out the effect sizes with lowest SE per group per study (some studies
 # have multiple groups), and the effects with the lowest SE. In case some
