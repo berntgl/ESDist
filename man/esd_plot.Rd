@@ -13,6 +13,7 @@ esd_plot(
   min_group_size = 20,
   weighted = FALSE,
   method = NULL,
+  abs = FALSE,
   ci = FALSE,
   sesoi = NULL,
   bin_width = 0.1,

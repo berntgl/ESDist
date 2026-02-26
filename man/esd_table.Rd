@@ -12,6 +12,7 @@ esd_table(
   min_group_size = 3,
   weighted = FALSE,
   method = "quads",
+  abs = FALSE,
   ci = FALSE,
   n_bootstrap = 1000,
   bowley = FALSE,

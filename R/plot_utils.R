@@ -207,7 +207,7 @@ iceberg_plot <- function(df,
                      binwidth = bin_width,
                      center = (bin_width / 2)) +
       theme_minimal() +
-      geom_hline(aes(yintercept = 0), size = 0.2) +
+      geom_hline(aes(yintercept = 0), linewidth = 0.2) +
       labs(x = es_type, y = y_label) +
       scale_y_continuous(labels = function(x) abs(x)) +
       theme(axis.text  = element_text(size = 10),
