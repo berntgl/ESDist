@@ -6,6 +6,8 @@
 #' @param probs A vector of quantiles ot compute. Given by parent function.
 #' @param weighted Defaults to FALSE. If set to TRUE, will weight all effect
 #' sizes by their standard error (requires `se` to be defined).
+#' @param abs Defaults to FALSE. When set to TRUE, will calculate benchmarks on
+#' absolute effect sizes only.
 #' @param bowley Defaults to FALSE. Will calculate Bowley's skewness when set
 #' to TRUE.
 #' @param n_bootstrap Number of bootstrapped samples for benchmark 95% CIs.
@@ -111,6 +113,8 @@ calculate_percentiles_ci <- function(df,
 #' @param weighted Defaults to FALSE. If set to TRUE, will weight all effect
 #' sizes by their standard error (requires `se` to be defined).
 #' @param probs A vector of quantiles ot compute. Given by parent function.
+#' @param abs Defaults to FALSE. When set to TRUE, will calculate benchmarks on
+#' absolute effect sizes only.
 #' @param bowley Defaults to FALSE. Will calculate Bowley's skewness when set
 #' to TRUE.
 #' @param ndec Number of decimals. Defaults to 2.

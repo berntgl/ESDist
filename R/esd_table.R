@@ -11,6 +11,8 @@
 #' @param method Defaults to "quads". Can be set to "quads" (.25, .5, .75) or
 #' "thirds" (.1665, .5, .8335) to plot vertical lines based on the respective
 #'  benchmarks.
+#' @param abs Defaults to FALSE. When set to TRUE, will calculate benchmarks on
+#' absolute effect sizes only.
 #' @param ci Defaults to FALSE. If set to TRUE, will plot 95% CIs for each
 #' benchmark (requires `method` to be defined).
 #' @param n_bootstrap Number of bootstrapped samples for benchmark 95% CIs.
@@ -133,6 +135,7 @@ esd_table <- function(df,
                                           se = deparse(substitute(se)),
                                           probs = probs,
                                           weighted = weighted,
+                                          abs = abs,
                                           bowley = bowley,
                                           n_bootstrap = n_bootstrap,
                                           ndec = ndec)
@@ -145,6 +148,7 @@ esd_table <- function(df,
                                        se = deparse(substitute(se)),
                                        probs = probs,
                                        weighted = weighted,
+                                       abs = abs,
                                        bowley = bowley,
                                        ndec = ndec)
     }

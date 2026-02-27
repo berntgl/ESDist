@@ -12,6 +12,9 @@
 #' @param method Defaults to "quads". Can be set to "quads" (.25, .5, .75) or
 #' "thirds" (.1665, .5, .8335) to plot vertical lines based on the respective
 #'  benchmarks.
+#' @param abs Defaults to FALSE. When set to TRUE, will calculate benchmarks on
+#' absolute effect sizes only. Note that publication bias adjustment will be
+#' performed prior to converting all effect sizes to absolute values.
 #' @param ci Defaults to FALSE. If set to TRUE, will plot 95% CIs for each
 #' benchmark (requires `method` to be defined).
 #' @param n_bootstrap Number of bootstrapped samples for benchmark 95% CIs.
@@ -36,6 +39,7 @@ esd_table_pba <- function(df = NULL,
                           min_group_size = 3,
                           weighted = FALSE,
                           method = "quads",
+                          abs = FALSE,
                           ci = FALSE,
                           n_bootstrap = 1000,
                           bowley = FALSE,
@@ -73,8 +77,6 @@ esd_table_pba <- function(df = NULL,
                      lim_obj[15], # lower.adjust
                      lim_obj[16], # upper.adjust
                      lim_obj[["x"]][["byvar"]])
-    df$TE_abs <- abs(df$TE)
-    df$TE.limit_abs <- abs(df$TE.limit)
     colnames(df)[11] <- "byvar"
     df <- as.data.frame(df)
   } else {
@@ -88,8 +90,7 @@ esd_table_pba <- function(df = NULL,
                      lim_obj[13], # TE.adjust
                      lim_obj[15], # lower.adjust
                      lim_obj[16]) # upper.adjust
-    df$TE_abs <- abs(df$TE)
-    df$TE.limit_abs <- abs(df$TE.limit)
+
     df <- as.data.frame(df)
   }
 
@@ -101,6 +102,7 @@ esd_table_pba <- function(df = NULL,
                                      grouping_var = byvar,
                                      min_group_size = min_group_size,
                                      method = method,
+                                     abs = abs,
                                      ci = ci,
                                      n_bootstrap = n_bootstrap,
                                      bowley = bowley,
@@ -112,6 +114,7 @@ esd_table_pba <- function(df = NULL,
                                      grouping_var = byvar,
                                      min_group_size = min_group_size,
                                      method = method,
+                                     abs = abs,
                                      ci = ci,
                                      n_bootstrap = n_bootstrap,
                                      bowley = bowley,
