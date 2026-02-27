@@ -21,26 +21,27 @@ plot1
 # If we want to calculate small/medium/large effect size benchmarks, we can do
 # so by specifying a method. We can choose between the more common "quads"
 # method and the "thirds" method that was used by Schäfer and Schwarz (2019).
-# When we want to calculate such benchmarks, we need to use the absolute effect
-# sizes only. Below, we first create a column in our dataset called yi_abs,
-# which contains only absolute effect sizes. We then save a plot using the
-# thirds method to a variable called plot2, and a plot using the quads method
-# to a variable called plot4. We will also calculate the corresponding values
-# for each percentile
+# When we want to calculate such benchmarks, it is recommended to use absolute
+# effect sizes only. Below, we create an ESD plot where we also highlight the
+# benchmark estimates, as well as their 95% CIs by specifying "quads" as our
+# `method` and by setting `ci` to TRUE. We also set `abs` to TRUE so we use only
+# absolute effect sizes.
 
 
-plot2 <- esd_plot(df = ot_dat, #we will now use absolute ES values only
+plot2 <- esd_plot(df = ot_dat,
                   es = yi,
                   es_type = "Hedges' g",
-                  method = "quads")
+                  method = "quads",
+                  ci = TRUE,
+                  abs = TRUE)
 
 plot2
 
 
 # If we want to determine the range of effect sizes that a study design can
-# detect, we can do so by setting a smallest effect size of interest (sesoi). In this
-# case, we will pretend that we have a study that can detect an effect size of
-# d = 0.3 with enough power. By adding the argument sesoi = 0.3, we can
+# detect, we can do so by setting a smallest effect size of interest (sesoi).
+# In this case, we will pretend that we have a study that can detect an effect
+# size of g = 0.3 with enough power. By adding the argument sesoi = 0.3, we can
 # calculate and visualise the range of empirical effect sizes that we can
 # reliably detect. In the code below, we create such a plot and save it to a
 # variable called plot3. The plot also tells us that 55.17% of the empirical
@@ -50,25 +51,24 @@ plot2
 plot3 <- esd_plot(df = ot_dat, #we will now use absolute ES values only
                   es = yi,
                   es_type = "Hedges' g",
-                  sesoi = 0.3)
+                  sesoi = 0.3,
+                  abs = TRUE)
 
 plot3
-
-
-# esd_plot_group() =================================
 
 # Our dataset has several subgroups (e.g., healthy participants, ASD,
 # Schizophrenia, etc.) that we might want to compare. In the code below we
 # compare plots for each group and save the figure to a variable called plot4.
 # Although, theoretically,we could compare all groups, some groups only have
 # one or a few studies. As such, these groups are not very informative. The
-# esd_plot_group() function therefore only includes groups with at least 20
+# esd_plot() function therefore only includes groups with at least 20
 # studies
 
-plot4 <- esd_plot_group(df = ot_dat,
-                    es = yi,
-                    es_type = "Hedges' g",
-                    grouping_var = group)
+plot4 <- esd_plot(df = ot_dat,
+                  es = yi,
+                  es_type = "Hedges' g",
+                  grouping_var = group,
+                  abs = TRUE)
 plot4
 
 # We can also use this type of visualisation to compare effect size benchmarks.
@@ -76,11 +76,13 @@ plot4
 # approcah (note that it is also possible to use the thirds approach). We store
 # the figure in a variable called plot5.
 
-plot5 <- esd_plot_group(df = ot_dat,
-                        es = yi,
-                        es_type = "Hedges' g",
-                        grouping_var = group,
-                        method = 'quads')
+plot5 <- esd_plot(df = ot_dat,
+                  es = yi,
+                  es_type = "Hedges' g",
+                  grouping_var = group,
+                  method = "quads",
+                  ci = TRUE,
+                  abs = TRUE)
 
 plot5
 
@@ -92,18 +94,12 @@ plot5
 # The esd_plot_pba() function uses the limitmeta function from metasens to plot
 # the distribution of adjusted effect sizes against the distribution of
 # unadjusted effect sizes. We only need to add one new argument, "se", which
-# corresponds to the column with standard error. Alternatively, we can create a
-# separate object of the class "limitmeta" by loading the meta and metasens
-# packages and using the metagen and limitmeta functions, respectively. Instead
-# of defining df, es, and se as function arguments, we can then define a single
-# lim_obj variable. However, in the following examples, we follow the former
-# method.
+# corresponds to the column with standard error.
 
 plot6 <- esd_plot_pba(df = ot_dat,
                       es = yi,
                       se = sei,
-                      es_type = "Hedges' g",
-                      method = "quads")
+                      es_type = "Hedges' g")
 plot6
 
 
@@ -115,7 +111,9 @@ plot7 <- esd_plot_pba(df = ot_dat,
                       es = yi,
                       se = sei,
                       es_type = "Hedges' g",
-                      method = "quads")
+                      method = "quads",
+                      ci = TRUE,
+                      abs = TRUE)
 plot7
 
 # Finally, we can visualise the range of detectable ESs based on a sesoi.
@@ -124,7 +122,8 @@ plot8 <- esd_plot_pba(df = ot_dat,
                       es = yi,
                       se = sei,
                       es_type = "Hedges' g",
-                      sesoi = 0.3)
+                      sesoi = 0.3,
+                      abs = TRUE)
 plot8
 
 # esd_table() =================================
@@ -134,27 +133,42 @@ plot8
 # all absolute effect sizes.
 
 table1 <- esd_table(df = ot_dat,
-                    es = yi,
-                    path_file_name = '../../Documents/Thesis/tables/table1.csv',
-                    )
+                    es = yi)
 
 table1
 
+# We can check the skewness of our distribution by setting `bowley` to TRUE.
+
+table2 <- esd_table(df = ot_dat,
+                    es = yi,
+                    bowley = TRUE)
+
+table2
 
 
 # In case we want to compare benchmarks between groups, we can define our
 # grouping variable in the function as well. In this case, we also get a summary
 # of all effect sizes in the bottom row. We save the results to a variable
-# called table2a.
+# called table2a. Again, we will calculate benchmarks based on the absolute ESD.
 
-table2 <- esd_table(df = ot_dat,
+table3 <- esd_table(df = ot_dat,
                      es = yi,
                      grouping_var = group,
-                     csv_write = TRUE,
-                     path_file_name = "../../Documents/Thesis/tables/table2.csv")
+                     abs = TRUE)
 
-table2
+table3
 
+
+# We can also calculate the 95% CI around the benchmark estimates using
+# bootstrapping by setting `ci` to TRUE.
+
+
+table4 <- esd_table(df = ot_dat,
+                    es = yi,
+                    ci = TRUE,
+                    abs = TRUE)
+
+table4
 
 # We can save this table as a .csv file by adding another argument to our
 # function. By setting csv_write = TRUE, and by specifying a file_name argument,
@@ -165,8 +179,12 @@ table2
 esd_table(df = ot_dat,
           es = yi,
           grouping_var = group,
+          abs = TRUE,
           csv_write = TRUE,
-          path_file_name = "../../Documents/Thesis/tables/table2.csv")
+          path_file_name = "/path/to/file.csv")
+
+
+
 
 # esd_table_pba() =================================
 
@@ -174,29 +192,34 @@ esd_table(df = ot_dat,
 # the plotting function, the esd_table_pba() function takes a 'limitmeta'
 # object. Here, we use the same l1 object we used earlier.
 
-table3 <- esd_table_pba(lim_obj = l1)
+table5 <- esd_table_pba(df = ot_dat,
+                        es = yi,
+                        se = sei,
+                        abs = TRUE)
 
-table3
+table5
 
 # In case you want to create benchmarks (and adjusted benchmarks) per group,
-# you will have to define a subgroup argument when creating the meta-object.
-# Here we create a new 'meta' object and corresponding 'limitmeta' object (m2
-# and l2) where we group the data based on the 'group' column in our dataset.
+# we simply need to specify the `grouping_var` again.
 
-m2 <- metagen(TE = ot_dat$yi, seTE = ot_dat$sei, subgroup = ot_dat$group)
-l2 <- limitmeta(m2)
+table6 <- esd_table_pba(df = ot_dat,
+                        es = yi,
+                        se = sei,
+                        grouping_var = group,
+                        abs = TRUE)
 
+table6
 
-# We can then use the l2 object in our table function, where we set the grouping
-# argument to TRUE.
+# Finally, we can also calculate the 95% CIs around the pba benchmark estimates
+# by setting `ci` to TRUE.
 
-table4 <- esd_table_pba(lim_obj = l2,
-                        grouping = TRUE,
-                        csv_write = TRUE,
-                        path_file_name = "../../Documents/Thesis/tables/table4.csv")
+table7 <- esd_table_pba(df = ot_dat,
+                        es = yi,
+                        se = sei,
+                        ci = TRUE,
+                        abs = TRUE)
 
-table4
-
+table7
 
 # esd_perc() =================================
 
