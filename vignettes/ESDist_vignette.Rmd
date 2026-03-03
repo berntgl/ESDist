@@ -15,7 +15,6 @@ knitr::opts_chunk$set(
   fig.height = 7
 )
 ```
-
 # ESDist: Calculate and visualise field-specific ESDs
 
 <!-- badges: start -->
@@ -59,7 +58,6 @@ the effect size column (`yi`).
 head(ESDist::ot_dat)
 ```
 
-
 ## esd_plot()
 ### Plot a simple ESD
 
@@ -101,13 +99,16 @@ plot2
 
 It is also possible to plot effect size benchmarks based on the 25th, 50th, and 
 75th percentiles by adding `method = "quads"` (or based on the 16.65th, 50th, 
-and 83.35th percentiles by adding `method = "thirds"`).
+and 83.35th percentiles by adding `method = "thirds"`). Following convention, we 
+plot these benchmarks based on the distribution of absolute effect sizes by 
+setting the `abs` argument to TRUE.
 
 ```{r, fig.height = 7}
 plot3 <- esd_plot(df = ot_dat,
                   es = yi,
                   es_type = "Hedges' g",
-                  method = "quads")
+                  method = "quads",
+                  abs = TRUE)
 
 plot3
 ```
@@ -115,36 +116,32 @@ plot3
 
 ### Plot empirical effect size ranges
 
-Finally, we can specify the range of effect sizes that is equal to or larger 
+We can specify the range of effect sizes that is equal to or larger 
 than a specified `sesoi`.
 
 ```{r, fig.height = 7}
 plot4 <- esd_plot(df = ot_dat,
                   es = yi,
+                  se = sei,
                   es_type = "Hedges' g",
-                  sesoi = 0.3)
+                  sesoi = 0.3,
+                  abs = TRUE)
 
 plot4
 ```
+### Plot ESD per group
 
-
-## esd_plot_group()
-### Simple plot per group
-
-The `esd_plot_group()` function allows for specifying a `grouping_var` to group 
-data and create plots for each group with 20 or more effect sizes. It otherwise
-takes the same arguments as the standard `esd_plot()` function (with the 
-exception of the `sesoi` argument).
+Finally, we can plot an ESD for each subgroup in our dataset by feeding our 
+grouping variable to the `grouping_var` argument.
 
 ```{r, fig.height = 7}
-plot5 <- esd_plot_group(df = ot_dat,
-                        es = yi,
-                        es_type = "Hedges' g",
-                        grouping_var = group)
+plot5 <- esd_plot(df = ot_dat,
+                  es = yi,
+                  es_type = "Hedges' g",
+                  grouping_var = group)
 
 plot5
 ```
-
 
 ## esd_plot_pba()
 ### Plot an adjusted ESD against a raw ESD.
@@ -164,13 +161,15 @@ plot6 <- esd_plot_pba(df = ot_dat,
 plot6
 ```
 
-
 ## esd_table()
 ### Calculate effect size benchmarks for whole dataset
 By using the `esd_table()` function, you can calculate the effect size 
 benchmarks for your dataset by specifying the dataset (`df`), and the column 
 containing all effect sizes (`es`). This will give you the effect size 
-benchmarks based on the 25th, 50th, and 75th percentiles.
+benchmarks based on the 25th, 50th, and 75th percentiles. Following convention, 
+we plot these benchmarks based on the distribution of absolute effect sizes by 
+setting the `abs` argument to TRUE.
+
 
 ```{r, message=FALSE, warning=FALSE}
 library(ESDist)
@@ -179,7 +178,8 @@ library(dplyr)
 
 ```{r}
 table1 <- esd_table(df = ot_dat,
-                    es = yi)
+                    es = yi,
+                    abs = TRUE)
 
 table1
 ```
@@ -193,7 +193,8 @@ required effect sizes per group can be overwritten by specifying
 ```{r}
 table2 <- esd_table(df = ot_dat,
                     es = yi,
-                    grouping_var = group)
+                    grouping_var = group,
+                    abs = TRUE)
 
 table2
 ```
@@ -209,7 +210,8 @@ estimates with a lower standard error)
 table3 <- esd_table(df = ot_dat,
                     es = yi,
                     se = sei,
-                    weighted = TRUE)
+                    weighted = TRUE,
+                    abs = TRUE)
 
 table3
 ```
@@ -224,10 +226,12 @@ as the standard `esd_table()` function.
 ```{r}
 table4 <- esd_table_pba(df = ot_dat,
                         es = yi,
-                        se = sei)
+                        se = sei,
+                        abs = TRUE)
 
 table4
 ```
+
 
 ### Editing and saving tables
 The values presented in the table default to two decimal places. This can be 
@@ -240,7 +244,7 @@ specific name.
 ## esd_perc()
 ### Calculating the percentile of a value
 Using `esd_perc()`, you can calculate to which percentile of the ESD a given 
-value corresponds. Note that absolute effect size values should be used.
+value corresponds.
 
 ```{r, message=FALSE, warning=FALSE}
 library(ESDist)
@@ -253,4 +257,5 @@ esd_perc(df = ot_dat,
          es = yi,
          value = 0.3)
 ```
+
 
