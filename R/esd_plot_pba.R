@@ -63,7 +63,7 @@ esd_plot_pba <- function(df = NULL,
                    lim_obj[15], # lower.adjust
                    lim_obj[16]) # upper.adjust
 
-  if (!missing(sesoi) | !missing(method)) {
+  if (!missing(sesoi) | !missing(method) | isTRUE(abs)) {
     sum_es <- FALSE
   }
 
