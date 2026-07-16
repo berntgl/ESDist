@@ -119,11 +119,11 @@ esd_plot_pba <- function(df = NULL,
 
     } else if (sum_es_type == "dot") {
       plot <- plot +
-        geom_segment(aes(x = lower.random[1], xend = upper.random[1], y = 2, yend = 2), color = primary_black, linetype = "solid", size = 2)+
+        geom_segment(aes(x = lower.random[1], xend = upper.random[1], y = 2, yend = 2), color = primary_black, linetype = "solid", linewidth = 2)+
         geom_point(aes(x = TE.random[1], y = 2), size = 5, color = primary_black)+
         geom_point(aes(x = lower.random[1], y = 2), pch = "|", size = 5, color = primary_black)+
         geom_point(aes(x = upper.random[1], y = 2), pch = "|", size = 5, color = primary_black)+
-        geom_segment(aes(x = lower.adjust[1], xend = upper.adjust[1], y = -2, yend = -2), color = primary_black, linetype = "solid", size = 2)+
+        geom_segment(aes(x = lower.adjust[1], xend = upper.adjust[1], y = -2, yend = -2), color = primary_black, linetype = "solid", linewidth = 2)+
         geom_point(aes(x = TE.adjust[1], y = -2), size = 5, color = primary_black)+
         geom_point(aes(x = lower.adjust[1], y = -2), pch = "|", size = 5, color = primary_black)+
         geom_point(aes(x = upper.adjust[1], y = -2), pch = "|", size = 5, color = primary_black)
